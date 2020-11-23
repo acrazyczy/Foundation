@@ -16,7 +16,7 @@ module ram_controller
     input wire [2 : 0] data_width_i,
     output reg data_rdy_o,
     input wire[`AddressWidth - 1 : 0] data_addr_i,
-    input wire['AddressWidth - 1 : 0] data_data_i,
+    input wire[`AddressWidth - 1 : 0] data_data_i,
     output reg[`IDWidth - 1 : 0] data_data_o,
 
     input wire [7 : 0] ram_i,
@@ -143,8 +143,7 @@ module ram_controller
                 S0: current_stage <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_i == 3'b001 ? OK : S1;
                 S1: current_stage <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_i == 3'b010 ? OK : S2;
                 S2: current_stage <= S3;
-                S3: current_stage <= OK;
-                OK: begin
+                S3: begin
                     current_stage <= IDLE;
                     current_rw_state <= NONE;
                 end
@@ -157,7 +156,7 @@ module ram_controller
             ram_rw_o = 1'b0;
             ram_addr_o = {`AddressWidth{1'b0}};
             ram_data_o = {`IDWidth{1'b0}};
-        end else case (current_stage)
+        end else if (rdy_in) case (current_stage)
             S0: case (current_rw_state)
                     RINST: begin
                         ram_rw_o = 1'b0;
@@ -226,9 +225,6 @@ module ram_controller
                         ram_data_o = data_data_i[31 : 24];
                     end
                 endcase
-            OK: begin
-                /* to do */
-            end
             IDLE: begin
                 ram_rw_o = 1'b0;
                 ram_addr_o = {`AddressWidth{1'b0}};
