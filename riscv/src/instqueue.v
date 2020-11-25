@@ -9,7 +9,7 @@ module instqueue(
     input wire if_instqueue_en_in,
     input wire[`IDWidth - 1 : 0] if_instqueue_inst_in,
     input wire [`AddressWidth - 1 : 0] if_instqueue_pc_in,
-    output wire instqueue_if_rdy_out,
+    output reg instqueue_if_rdy_out,
 
     //from reservation station
     input wire rs_instqueue_rdy_in,
@@ -20,9 +20,9 @@ module instqueue(
 
     //from & to decoder
     input wire decoder_instqueue_rst_in,
-    output wire instqueue_decoder_en_out,
-    output wire[`IDWidth - 1 : 0] instqueue_decoder_inst_out,
-    output wire[`AddressWidth - 1 : 0] instqueue_decoder_pc_out
+    output reg instqueue_decoder_en_out,
+    output reg[`IDWidth - 1 : 0] instqueue_decoder_inst_out,
+    output reg[`AddressWidth - 1 : 0] instqueue_decoder_pc_out
 );
     localparam QueueCount = 8;
     localparam QueueWidth = 3;
