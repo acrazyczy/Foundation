@@ -9,7 +9,6 @@ module instqueue(
     input wire if_instqueue_en_in,
     input wire[`IDWidth - 1 : 0] if_instqueue_inst_in,
     input wire [`AddressWidth - 1 : 0] if_instqueue_pc_in,
-    output reg instqueue_if_rdy_out,
 
     //from reservation station
     input wire rs_instqueue_rdy_in,
@@ -22,7 +21,10 @@ module instqueue(
     input wire decoder_instqueue_rst_in,
     output reg instqueue_decoder_en_out,
     output reg[`IDWidth - 1 : 0] instqueue_decoder_inst_out,
-    output reg[`AddressWidth - 1 : 0] instqueue_decoder_pc_out
+    output reg[`AddressWidth - 1 : 0] instqueue_decoder_pc_out,
+
+    //from branch predictor
+    input wire bp_instqueue_rst_in
 );
     localparam QueueCount = 8;
     localparam QueueWidth = 3;
@@ -41,7 +43,7 @@ module instqueue(
             end
             instqueue_decoder_en_out <= 1'b0;
         end if (rdy_in) begin
-            if (rob_instqueue_rst_in || decoder_instqueue_rst_in) begin
+            if (rob_instqueue_rst_in || decoder_instqueue_rst_in || bp_instqueue_rst_in) begin
                 head <= 3'b000;
                 tail <= 3'b000;
                 for (i = 0;i < QueueCount;++ i) begin
@@ -63,10 +65,6 @@ module instqueue(
                 end else instqueue_decoder_en_out <= 1'b0;
             end
         end
-    end
-
-    always @(head, tail) begin
-        instqueue_if_rdy_out = head != tail;
     end
 
 endmodule : instqueue
