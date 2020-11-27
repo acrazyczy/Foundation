@@ -18,7 +18,7 @@ module BP(
     output wire[`AddressWidth - 1 : 0] bp_if_pc_out,
 
     //to dispatcher
-    output wire bp_rs_taken_out,
+    output wire bp_dispatcher_taken_out,
 
     //from reorder buffer
     input wire rob_bp_en_in,
@@ -37,11 +37,11 @@ module BP(
                 if (prediction[(decoder_bp_pc_in >> 2) & mask] > 2'b01) begin
                     bp_if_en_out = 1'b1;
                     bp_if_pc_out = decoder_bp_target_in;
-                    bp_rs_taken_out = 1'b1;
+                    bp_dispatcher_taken_out = 1'b1;
                     bp_instqueue_rst_out = 1'b1;
                 end else begin
                     bp_if_en_out = 1'b0;
-                    bp_rs_taken_out = 1'b0;
+                    bp_dispatcher_taken_out = 1'b0;
                     bp_instqueue_rst_out = 1'b0;
                 end
             end

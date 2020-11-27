@@ -1,15 +1,18 @@
 `include "constant.vh"
 
 module dispatcher(
-    input clk_in,
-    input rst_in,
-    input rdy_in,
+    input wire clk_in,
+    input wire rst_in,
+    input wire rdy_in,
 
     //from decoder
     input wire[`RegWidth - 1 : 0] decoder_dispatcher_rs_in, decoder_dispatcher_rt_in, decoder_dispatcher_rd_in,
     input wire[`IDWidth - 1 : 0] decoder_dispatcher_imm_in,
     input wire[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode_in,
     input wire[`AddressWidth - 1 : 0] decoder_dispatcher_pc_in,
+
+    //from branch predictor
+    input wire bp_dispatcher_taken_in,
 
     //from & to regfile
     output wire[`RegWidth - 1 : 0] dispatcher_regfile_rs_out,
@@ -46,7 +49,8 @@ module dispatcher(
     output wire dispatcher_rob_en_out,
     output wire[`InstTypeWidth - 1 : 0] dispatcher_rob_opcode_out,
     output wire[`RegWidth - 1 : 0] dispatcher_rob_dest_out,
-    output wire[`AddressWidth - 1 : 0] dispatcher_rob_pc_out
+    output wire[`AddressWidth - 1 : 0] dispatcher_rob_pc_out,
+    output wire dispatcher_rob_taken_out
 );
 
     always @(*) begin
@@ -56,6 +60,8 @@ module dispatcher(
             dispatcher_rob_en_out = 1'b0;
         end else if (rdy_in && decoder_dispatcher_opcode_in != `NOP) begin
             dispatcher_rs_pc_out = decoder_dispatcher_pc_in;
+            dispatcher_rob_pc_out = decoder_dispatcher_pc_in;
+            dispatcher_rob_taken_out = bp_dispatcher_taken_in;
 
             dispatcher_regfile_rs_out = decoder_dispatcher_rs_in;
             if (regfile_dispatcher_rs_busy_in) begin
