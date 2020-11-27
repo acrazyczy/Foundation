@@ -38,7 +38,7 @@ module instqueue(
             head <= 3'b000;
             tail <= 3'b000;
             for (i = 0;i < QueueCount;++ i) begin
-                inst[i] <= `IDWidth'b0;
+                inst[i] <= `NOP;
                 pc[i] <= `AddressWidth'b0;
             end
             instqueue_decoder_en_out <= 1'b0;
@@ -47,7 +47,7 @@ module instqueue(
                 head <= 3'b000;
                 tail <= 3'b000;
                 for (i = 0;i < QueueCount;++ i) begin
-                    inst[i] <= `IDWidth'b0;
+                    inst[i] <= `NOP;
                     pc[i] <= `AddressWidth'b0;
                 end
                 instqueue_decoder_en_out <= 1'b0;

@@ -9,13 +9,13 @@ module IF(
     input wire icache_if_rdy_in,
     input wire icache_if_miss_in,
     input wire[`IDWidth - 1 : 0] icache_if_inst_inst_in,
-    output wire if_icache_en_out,
-    output wire if_icache_inst_addr_out,
+    output reg if_icache_en_out,
+    output reg if_icache_inst_addr_out,
 
     //from & to instruction queue
-    output wire if_instqueue_en_out,
-    output wire[`IDWidth - 1 : 0] if_instqueue_inst_out,
-    output wire [`AddressWidth - 1 : 0] if_instqueue_pc_out,
+    output reg if_instqueue_en_out,
+    output reg[`IDWidth - 1 : 0] if_instqueue_inst_out,
+    output reg[`AddressWidth - 1 : 0] if_instqueue_pc_out,
 
     //from branch predictor
     input wire bp_if_en_in,

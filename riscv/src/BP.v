@@ -17,7 +17,7 @@ module BP(
     output wire bp_if_en_out,
     output wire[`AddressWidth - 1 : 0] bp_if_pc_out,
 
-    //to reservation station
+    //to dispatcher
     output wire bp_rs_taken_out,
 
     //from reorder buffer
