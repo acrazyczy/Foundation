@@ -28,7 +28,6 @@ module dispatcher(
     output wire dispatcher_regfile_reorder_out,
 
     //from & to reservation station
-    input wire[`RSWidth - 1 : 0] rs_dispatcher_r_in,
     output wire dispatcher_rs_en_out,
     output wire[`IDWidth - 1 : 0] dispatcher_rs_a_out,
     output wire[`ROBWidth - 1 : 0] dispatcher_rs_qj_out,

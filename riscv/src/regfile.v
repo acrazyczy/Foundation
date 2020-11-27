@@ -17,18 +17,32 @@ module regfile(
     input wire dispatcher_regfile_rd_en_in,
     input wire[`RegWidth - 1 : 0] dispatcher_regfile_rd_in,
     input wire dispatcher_regfile_reorder_in,
+
+    //from reorder buffer
+    input wire rob_regfile_en_in,
+    input wire[`RegWidth - 1 : 0] rob_regfile_d_in,
+    input wire[`IDWidth - 1 : 0] rob_regfile_value_in,
+    input wire[`ROBWidth - 1 : 0] rob_regfile_h_in,
+    input wire rob_regfile_rst_in
 );
+    //to do: reg0
     reg[`IDWidth - 1 : 0] register[`RegCount - 1 : 0];
     reg busy[`RegCount - 1 : 0];
     reg[`ROBWidth - 1 : 0] reorder[`RegCount - 1 : 0];
 
     always @(posedge clk_in) begin
         if (rst_in) begin
-            for (i = 0;i < RegCount;++ i) begin
+            for (i = 0;i < `RegCount;++ i) begin
                 register[i] <= `IDWidth'b0;
                 busy[i] <= 1'b0;
+                reorder[i] <= `ROBWidth'b0;
             end
-        end else if (rdy_in) begin
+        end else if (rdy_in) if (rob_regfile_rst_in) begin
+            for (i = 0;i < `RegCount;++ i) begin
+                busy[i] <= 1'b0;
+                reorder[i] <= `ROBWidth'b0;
+            end
+        end else begin
             if (dispatcher_regfile_rd_en_in) begin
                 busy[dispatcher_regfile_rd_in] <= 1'b1;
                 reorder[dispatcher_regfile_rd_in] <= dispatcher_regfile_reorder_in;
@@ -38,17 +52,31 @@ module regfile(
 
     always @(*) begin
         if (rst_in) begin
-            for (i = 0;i < RegCount;++ i) begin
+            for (i = 0;i < `RegCount;++ i) begin
                 register[i] = `IDWidth'b0;
                 busy[i] = 1'b0;
+                reorder[i] = `ROBWidth'b0;
             end
-        end else if (rdy_in) begin
+        end else if (rdy_in) if (rob_regfile_rst_in) begin
+            for (i = 0;i < `RegCount;++ i) begin
+                busy[i] = 1'b0;
+                reorder[i] = `ROBWidth'b0;
+            end
+        end else begin
             regfile_dispatcher_rs_busy_out = busy[dispatcher_regfile_rs_in];
             regfile_dispatcher_rs_out = register[dispatcher_regfile_rs_in];
             regfile_dispatcher_rs_reorder_out = reorder[dispatcher_regfile_rs_in];
             regfile_dispatcher_rt_busy_out = busy[dispathcer_regfile_rt_in];
             regfile_dispathcer_rt_out = regsiter[dispather_regfile_rt_in];
             regfile_dispathcer_rt_reorder_out = reorder[dispatcher_regfile_rt_in];
+
+            if (rob_regfile_en_in) begin
+                register[rob_regfile_d_in] = rob_regfile_value_in;
+                if (reorder[rob_regfile_d_in] == rob_regfile_h_in) begin
+                    busy[rob_regfile_d_in] = 1'b0;
+                    reorder[rob_regfile_d_in] = `ROBWidth'b0;
+                end
+            end
         end
     end
 
