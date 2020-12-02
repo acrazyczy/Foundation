@@ -36,6 +36,7 @@ module dispatcher(
     output wire[`IDWidth - 1 : 0] dispatcher_rs_vk_out,
     output wire[`ROBWidth - 1 : 0] dispatcher_rs_dest_out,
     output wire[`AddressWidth - 1 : 0] dispatcher_rs_pc_out,
+    output wire[`InstTypeWidth - 1 : 0] dispatcher_rs_opcode_out,
 
     //from & to reorder buffer
     output wire[`ROBWidth - 1 : 0] dispatcher_rob_rs_h_out,
@@ -92,6 +93,7 @@ module dispatcher(
             dispatcher_rs_a_out = decoder_dispatcher_imm_in;
             dispatcher_regfile_reorder_out = rob_dispatcher_b_in;
             dispatcher_rob_dest_out = decoder_dispatcher_rd_in;
+            dispatcher_rs_opcode_out = decoder_dispatcher_opcode_in;
         end
     end
 

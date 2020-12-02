@@ -35,7 +35,7 @@ module icache(
         if (rst_in) begin
             icache_if_rdy_out = 1'b1;
             icache_ramctrl_en_i = 1'b0;
-            for (i = 0;i < IndexCount;++ i) begin
+            for (i = 0;i < IndexCount;i = i + 1) begin
                 cache[i] = 0;
                 valid[i] = 1'b0;
             end

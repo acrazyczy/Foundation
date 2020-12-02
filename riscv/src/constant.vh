@@ -12,6 +12,8 @@
 `define ROBWidth 5
 `define RSCount 32
 `define RSWidth 5
+`define LBCount 32
+`define LBWidth 5
 
 //Instruction Type
 `define NOP 6'b000000

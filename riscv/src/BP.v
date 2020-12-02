@@ -31,7 +31,7 @@ module BP(
 
     always @(*) begin
         if (rst_in) begin
-            for (i = 0;i <= mask;++ i) prediction[i] = 2'b01;
+            for (i = 0;i <= mask;i = i + 1) prediction[i] = 2'b01;
         end else if (rdy_in) begin
             if (decoder_bp_en_in) begin
                 if (prediction[(decoder_bp_pc_in >> 2) & mask] > 2'b01) begin

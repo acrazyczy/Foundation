@@ -32,13 +32,13 @@ module regfile(
 
     always @(posedge clk_in) begin
         if (rst_in) begin
-            for (i = 0;i < `RegCount;++ i) begin
+            for (i = 0;i < `RegCount;i = i + 1) begin
                 register[i] <= `IDWidth'b0;
                 busy[i] <= 1'b0;
                 reorder[i] <= `ROBWidth'b0;
             end
         end else if (rdy_in) if (rob_regfile_rst_in) begin
-            for (i = 0;i < `RegCount;++ i) begin
+            for (i = 0;i < `RegCount;i = i + 1) begin
                 busy[i] <= 1'b0;
                 reorder[i] <= `ROBWidth'b0;
             end
@@ -52,13 +52,13 @@ module regfile(
 
     always @(*) begin
         if (rst_in) begin
-            for (i = 0;i < `RegCount;++ i) begin
+            for (i = 0;i < `RegCount;i = i + 1) begin
                 register[i] = `IDWidth'b0;
                 busy[i] = 1'b0;
                 reorder[i] = `ROBWidth'b0;
             end
         end else if (rdy_in) if (rob_regfile_rst_in) begin
-            for (i = 0;i < `RegCount;++ i) begin
+            for (i = 0;i < `RegCount;i = i + 1) begin
                 busy[i] = 1'b0;
                 reorder[i] = `ROBWidth'b0;
             end
