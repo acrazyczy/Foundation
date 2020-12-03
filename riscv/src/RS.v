@@ -79,6 +79,7 @@ module RS(
             end
             head <= `RSWidth'b0;
             tail <= `RSWidth'b0;
+            rs_instqueue_rdy_out = 1'b1;
         end else if (rdy_in) if (rob_rs_rst_in) begin
             id <= `RSWidth'b0;
             for (i = 0;i < `RSCount;i = i + 1) begin
@@ -87,6 +88,7 @@ module RS(
             end
             head <= `RSWidth'b0;
             tail <= `RSWidth'b0;
+            rs_instqueue_rdy_out = 1'b1;
         end else begin
             if (dispatcher_rs_en_in) begin
                 busy[id] <= 1'b1;
@@ -162,9 +164,12 @@ module RS(
                     head = (head + 1) % `RSCount;
                 end
             if (ready_to_ALU != NRS) busy[ready_to_ALU] = 1'b0;
+            rs_instqueue_rdy_out = 1'b0;
             for (i = 0;i < `RSCount;i = i + 1)
-                if (!busy[i])
+                if (!busy[i]) begin
                     id = i;
+                    rs_instqueue_rdy_out = 1'b1;
+                end
         end
     end
 
@@ -177,6 +182,7 @@ module RS(
             end
             head = `RSWidth'b0;
             tail = `RSWidth'b0;
+            rs_instqueue_rdy_out = 1'b1;
         end else if (rdy_in) if (rob_rs_rst_in) begin
             id = `RSWidth'b0;
             for (i = 0;i < `RSCount;i = i + 1) begin
@@ -185,6 +191,7 @@ module RS(
             end
             head = `RSWidth'b0;
             tail = `RSWidth'b0;
+            rs_instqueue_rdy_out = 1'b1;
         end else begin
             if (cdb_rs_en) begin
                 for (i = 0;i < `RSCount;i = i + 1) begin

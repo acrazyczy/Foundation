@@ -53,8 +53,8 @@ module instqueue(
                 instqueue_decoder_en_out <= 1'b0;
             end else begin
                 if (if_instqueue_en_in) begin
-                    inst[(tail + 1) % QueueCount] <= if_instqueue_inst_in;
-                    pc[(tail + 1) % QueueCount] <= if_instqueue_pc_in;
+                    inst[tail] <= if_instqueue_inst_in;
+                    pc[tail] <= if_instqueue_pc_in;
                     tail <= (tail + 1) % QueueCount;
                 end
                 if (rob_instqueue_rdy_in && rs_instqueue_rdy_in && head != tail) begin

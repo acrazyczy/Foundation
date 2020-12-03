@@ -16,8 +16,7 @@ module ALU(
     //from & to reorder buffer
     input wire rob_alu_rst_in,
     output wire[`ROBWidth - 1 : 0] alu_rob_h_out,
-    output wire[`IDWidth - 1 : 0] alu_rob_result_out,
-    output wire alu_rob_taken_out
+    output wire[`IDWidth - 1 : 0] alu_rob_result_out
 );
 
     always @(posedge clk_in) begin
@@ -30,14 +29,13 @@ module ALU(
             if (rob_alu_rst_in || rs_alu_opcode_in == `NOP) alu_rob_h_out = `ROBWidth'b0;
             else begin
                 alu_rob_h_out = rs_alu_dest_in;
-                if (`BEQ <= rs_alu_opcode_in && rs_alu_opcode_in <= `BGEU) alu_rob_result_out = rs_alu_pc_in + rs_alu_a_in;
                 case (rs_alu_opcode_in)
-                    `BEQ: alu_rob_taken_out = rs_alu_vj_in == rs_alu_vk_in;
-                    `BNE: alu_rob_taken_out = rs_alu_vj_in != rs_alu_vk_in;
-                    `BLT: alu_rob_taken_out = $signed(rs_alu_vj_in) < $signed(rs_alu_vk_in);
-                    `BGE: alu_rob_taken_out = $signed(rs_alu_vj_in) >= $signed(rs_alu_vk_in);
-                    `BLTU: alu_rob_taken_out = rs_alu_vj_in < rs_alu_vk_in;
-                    `BGEU: alu_rob_taken_out = rs_alu_vj_in >= rs_alu_vk_in;
+                    `BEQ: alu_rob_result_out = rs_alu_vj_in == rs_alu_vk_in;
+                    `BNE: alu_rob_result_out = rs_alu_vj_in != rs_alu_vk_in;
+                    `BLT: alu_rob_result_out = $signed(rs_alu_vj_in) < $signed(rs_alu_vk_in);
+                    `BGE: alu_rob_result_out = $signed(rs_alu_vj_in) >= $signed(rs_alu_vk_in);
+                    `BLTU: alu_rob_result_out = rs_alu_vj_in < rs_alu_vk_in;
+                    `BGEU: alu_rob_result_out = rs_alu_vj_in >= rs_alu_vk_in;
                     `LUI: alu_rob_result_out = rs_alu_a_in;
                     `AUIPC: alu_rob_result_out = rs_alu_pc_in + rs_alu_a_in;
                     `JAL: alu_rob_result_out = rs_alu_pc_in + 4;
