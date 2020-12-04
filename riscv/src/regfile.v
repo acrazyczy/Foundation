@@ -43,7 +43,7 @@ module regfile(
                 reorder[i] <= `ROBWidth'b0;
             end
         end else begin
-            if (dispatcher_regfile_rd_en_in) begin
+            if (dispatcher_regfile_rd_en_in && dispatcher_regfile_rd_in != `RegWidth'b0) begin
                 busy[dispatcher_regfile_rd_in] <= 1'b1;
                 reorder[dispatcher_regfile_rd_in] <= dispatcher_regfile_reorder_in;
             end
@@ -62,22 +62,20 @@ module regfile(
                 busy[i] = 1'b0;
                 reorder[i] = `ROBWidth'b0;
             end
-        end else begin
-            regfile_dispatcher_rs_busy_out = busy[dispatcher_regfile_rs_in];
-            regfile_dispatcher_rs_out = register[dispatcher_regfile_rs_in];
-            regfile_dispatcher_rs_reorder_out = reorder[dispatcher_regfile_rs_in];
-            regfile_dispatcher_rt_busy_out = busy[dispathcer_regfile_rt_in];
-            regfile_dispathcer_rt_out = regsiter[dispather_regfile_rt_in];
-            regfile_dispathcer_rt_reorder_out = reorder[dispatcher_regfile_rt_in];
-
-            if (rob_regfile_en_in) begin
-                register[rob_regfile_d_in] = rob_regfile_value_in;
-                if (reorder[rob_regfile_d_in] == rob_regfile_h_in) begin
-                    busy[rob_regfile_d_in] = 1'b0;
-                    reorder[rob_regfile_d_in] = `ROBWidth'b0;
-                end
+        end else if (rob_regfile_en_in && rob_regfile_d_in != `RegWidth'b0) begin
+            register[rob_regfile_d_in] = rob_regfile_value_in;
+            if (reorder[rob_regfile_d_in] == rob_regfile_h_in) begin
+                busy[rob_regfile_d_in] = 1'b0;
+                reorder[rob_regfile_d_in] = `ROBWidth'b0;
             end
         end
     end
+
+    assign regfile_dispatcher_rs_busy_out = dispatcher_regfile_rs_in == `RegWidth'b0 ? 0 : busy[dispatcher_regfile_rs_in];
+    assign regfile_dispatcher_rs_out = dispatcher_regfile_rs_in == `RegWidth'b0 ? `IDWidth'b0 : register[dispatcher_regfile_rs_in];
+    assign regfile_dispatcher_rs_reorder_out = dispatcher_regfile_rs_in == `RegWidth'b0 ? `ROBWidth'b0 : reorder[dispatcher_regfile_rs_in];
+    assign regfile_dispatcher_rt_busy_out = dispatcher_regfile_rt_in == `RegWidth'b0 ? 0 : busy[dispatcher_regfile_rt_in];
+    assign regfile_dispatcher_rt_out = dispatcher_regfile_rt_in == `RegWidth'b0 ? `IDWidth'b0 : register[dispatcher_regfile_rt_in];
+    assign regfile_dispatcher_rt_reorder_out = dispatcher_regfile_rt_in == `RegWidth'b0 ? `ROBWidth'b0 : reorder[dispatcher_regfile_rt_in];
 
 endmodule : regfile
