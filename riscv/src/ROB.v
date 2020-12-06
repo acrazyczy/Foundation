@@ -40,12 +40,12 @@ module rob(
     output wire rob_instqueue_rdy_out,
 
     //from & to load buffer
-    input wire[`ROBWidth - 1 : 0] lbuffer_rob_dest_in,
+    input wire[`ROBWidth - 1 : 0] lbuffer_rob_h_in,
     input wire[`IDWidth - 1 : 0] lbuffer_rob_value_in,
     input wire lbuffer_rob_en_in,
     input wire[`ROBWidth - 1 : 0] lbuffer_rob_rob_index_in,
     input wire[`LBWidth - 1 : 0] lbuffer_rob_lbuffer_index_in,
-    output wire[`LBCount - 1 : 0] rob_lbuffer_state_out,
+    output wire[`LBWidth - 1 : 0] rob_lbuffer_index_out,
 
     //to regfile
     output wire rob_regfile_en_out,
@@ -64,8 +64,7 @@ module rob(
     output wire[`IDWidth - 1 : 0] rob_datactrl_data_out,
     input wire datactrl_rob_en_in,
 );
-    localparam IDLE = 1'b0;
-    localparam BUSY = 1'b1;
+//from 1 to ROBCount - 1
 
     reg busy[`ROBCount - 1 : 0];
     reg[`InstTypeWidth - 1 : 0] opcode[`ROBCount - 1 : 0];
@@ -79,32 +78,54 @@ module rob(
     reg[`LBWidth - 1 : 0] index[`ROBCount - 1 : 0];
     reg[`ROBWidth - 1 : 0] occupation[`ROBCount - 1 : 0];
     reg[`ROBWidth - 1 : 0] head, tail;
-    reg state;
+    reg[1 : 0] stage;
+    reg[`ROBWidth - 1 : 0] deactivated_rob;
+
+    localparam IDLE = 2'b00;
+    localparam PENDING = 2'b01;
+    localparam BUSY = 2'b10;
+
+//at posedge:
+//dispatcher sends an entry to tail
+//reorder buffer pop its head (if IDLE && STORE, set stage to PENDING; if BUSY && datactrl_rob_en_in, set to IDLE, pop)
+//ALU & addrunit & lbuffer send value to certain entry
+//reorder buffer tell lbuffer whether each entry is ready (deactivated_rob)
+
+//during clock cycle
+//if stage is PENDING, link datactrl
+//if stage is BUSY and datactrl_rob_en_in, clear occupation
+//if an entry is activated by lbuffer, calculate its occupation
+//deactivate
 
     always @(posedge clk_in) begin
         if (rst_in) begin
-            head <= `ROBCount'b1;
-            tail <= `ROBCount'b1;
-            for (i = 1;i < `ROBCount;i = i + 1) busy[i] <= 1'b0;
-            rob_instqueue_rdy_out <= 1'b1;
-        end if (rdy_in) if (dispatcher_rob_en_in) begin
-            busy[tail] <= 1'b1;
-            opcode[tail] <= dispatcher_rob_opcode_in;
-            dest[tail] <= dispatcher_rob_dest_in;
-            pc[tail] <= dispatcher_rob_pc_in;
-            bp_taken[tail] <= dispatcher_rob_taken_in;
-            activated[tail] <= 1'b0;
-            ready[tail] <= 1'b0;
-            tail <= tail % `ROBCount + 1;
-        end
-    end
-
-    always @(posedge clk_in) begin
-        rob_bp_en_out <= 1'b0;
-        rob_regfile_en_out <= 1'b0;
-        rob_lbuffer_state_out <= `LBCount'b0;
-        if (!rst_in && rdy_in)
-            if (state == IDLE && head != tail && ready[head] == 1'b1) begin
+            head <= `ROBWidth'b1;
+            tail <= `ROBWidth'b1;
+            deactivated_rob <= `LBWidth'b0;
+            for (i = 1;i < `ROBCount;i = i + 1) begin
+                busy[i] <= 1'b0;
+                index[i] <= `LBWidth'b0;
+            end
+            stage <= IDLE;
+        end else if (rdy_in) begin
+            if (dispatcher_rob_en_in) begin
+                busy[tail] <= 1'b1;
+                opcode[tail] <= dispatcher_rob_opcode_in;
+                dest[tail] <= dispatcher_rob_dest_in;
+                pc[tail] <= dispatcher_rob_pc_in;
+                bp_taken[tail] <= dispatcher_rob_taken_in;
+                activated[tail] <= 1'b0;
+                ready[tail] <= 1'b0;
+                tail <= tail % (`ROBCount - 1) + 1;
+            end
+            if (stage == PENDING) stage <= BUSY;
+            else if (stage == BUSY) begin
+                if (datactrl_rob_en_in) begin
+                    stage = IDLE;
+                    busy[head] <= 1'b0;
+                    head = head % (`ROBCount - 1) + 1;
+                end
+            end else if (head != tail && ready[head] == 1'b1)
                 if (`BEQ <= opcode[head] && opcode[head] <= `BGEU) begin
                     rob_bp_en_out <= 1'b1;
                     if (bp_taken[head] != alu_taken[head]) begin
@@ -114,52 +135,33 @@ module rob(
                     end else rob_bp_correct_out <= 1'b1;
                     rob_bp_pc_out <= pc[head];
                     busy[head] <= 1'b0;
-                    head <= head % `ROBCount + 1;
-                end else if (`SB <= opcode[head] && opcode[head] <= `SW) state <= BUSY;
+                    head <= head % (`ROBCount - 1) + 1;
+                end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= BUSY;
                 else begin
                     rob_regfile_en_out <= 1'b1;
                     rob_regfile_d_out <= dest[head];
                     rob_regfile_value_out <= value[head];
                     rob_regfile_h_out <= head;
                     busy[head] <= 1'b0;
-                    head <= head % `ROBCount + 1;
+                    head <= head % (`ROBCount - 1) + 1;
                 end
-            end
-    end
-
-    always @(*) begin
-        if (!rst_in && rdy_in) if (lbuffer_rob_en_in) begin
-            activate[lbuffer_rob_rob_index_in] = 1'b1;
-            occupation[lbuffer_rob_rob_index_in] = `ROBWidth'b0;
-            index[lbuffer_rob_rob_index_in] = lbuffer_rob_lbuffer_index_in;
-            for (i = head;i != lbuffer_rob_index_in;i = i % `ROBCount + 1)
-                if (`SB <= opcode[i] && opcode[i] <= `SW && address[i] == address[lbuffer_rob_rob_index_in])
-                    occupation[lbuffer_rob_rob_index_in] = occupation[lbuffer_rob_rob_index_in] + 1;
+            if (alu_rob_h_in != `ROBWidth'b0) value[alu_rob_h_in] <= alu_rob_result_in;
+            if (addrunit_rob_h_in != `ROBWidth'b0) address[addrunit_rob_h_in] <= alu_rob_result_in;
+            if (lbuffer_rob_h_in != `ROBWidth'b0) value[lbuffer_rob_h_in] <= lbuffer_rob_value_in;
+            deactivated_rob <= `LBWidth'b0;
+            for (i = head;i != tail;i = i % (`ROBCount - 1) + 1)
+                if (busy[i] && activated[i] && occupation[i] == `ROBWidth'b0)
+                    deactivated_rob <= index[i];
         end
     end
 
     always @(*) begin
-        rob_lbuffer_state_out = `LBCount'b0;
-        if (!rst_in && rdy_in) begin
-            for (i = 1;i < `ROBCount;i = i + 1)
-                if (busy[i] && activate[i] && occupation[i] == `ROBWidth'b0)
-                    rob_lbuffer_state_out = rob_lbuffer_state_out | (1 << index[i]);
-        end
-    end
-
-    always @(*) begin
-        if (rst_in) state = IDLE;
-        else if (rdy_in) if (state == BUSY) begin
-            if (datactrl_rob_en_in) begin
-                rob_datactrl_en_in = 1'b0;
-                for (i = head;i != tail;i = i % `ROBCount + 1)
-                    if (activated[i] && address[i] == address[head])
-                        occupation[i] = occupation[i] - 1;
-                busy[head] = 1'b0;
-                head = head % `ROBCount + 1;
-                state = IDLE;
-            end else begin
-                rob_datactrl_en_in = 1'b1;
+        if (rst_in) begin
+            rob_datactrl_en_out = 1'b0;
+            for (i = 1;i < `ROBCount;i = i + 1) activated[i] = 1'b0;
+        end else if (rdy_in) begin
+            if (stage == PENDING) begin
+                rob_datactrl_en_out = 1'b1;
                 rob_datactrl_addr_out = address[head];
                 rob_datactrl_data_out = value[head];
                 case (opcode[head])
@@ -167,15 +169,28 @@ module rob(
                     `SH: rob_datactrl_width_out = 3'b010;
                     `SW: rob_datactrl_width_out = 3'b100;
                 endcase
+            end else if (stage == BUSY && datactrl_rob_en_in)
+                for (i = head;i != tail;i = i % (`ROBCount - 1) + 1)
+                    if (activated[i] && address[i] == address[head])
+                        occupation[i] = occupation[i] - 1;
+            if (lbuffer_rob_en_in) begin
+                activaed[lbuffer_rob_en_in] = 1'b1;
+                occupation[lbuffer_rob_rob_index_in] = `ROBWidth'b0;
+                index[lbuffer_rob_rob_index_in] = lbuffer_rob_lbuffer_index_in;
+                for (i = head;i != lbuffer_rob_rob_index_in;i = i % `ROBCount + 1)
+                    if (`SB <= opcode[i] && opcode[i] <= `SW && address[i] == address[lbuffer_rob_rob_index_in])
+                        occupation[lbuffer_rob_rob_index_in] = occupation[lbuffer_rob_rob_index_in] + 1;
             end
+            activated[deactivated_rob] = 1'b0;
         end
     end
 
-    assign rob_instqueue_rdy_out = head != tail;
+    assign rob_instqueue_rdy_out = head != tail % (`ROBCount - 1) + 1;
     assign rob_dispatcher_rs_ready_out = ready[dispatcher_rob_rs_h_in];
     assign rob_dispatcher_rs_value_out = value[dispatcher_rob_rs_h_in];
     assign rob_dispatcher_rt_ready_out = ready[dispatcher_rob_rt_h_in];
     assign rob_dispatcher_rt_value_out = value[dispatcher_rob_rt_h_in];
     assign rob_dispatcher_b_out = tail;
+    assign rob_lbuffer_index_out = index[deactivated_rob];
 
 endmodule : rob

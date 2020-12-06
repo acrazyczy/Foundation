@@ -13,12 +13,15 @@ module lbuffer(
 
     //from & to reorder buffer
     input wire rob_lbuffer_rst_in,
-    output wire[`ROBWidth - 1 : 0] lbuffer_rob_dest_out,
+    output wire[`ROBWidth - 1 : 0] lbuffer_rob_h_out,
     output wire[`IDWidth - 1 : 0] lbuffer_rob_value_out,
     output wire lbuffer_rob_en_out,
     output wire[`ROBWidth - 1 : 0] lbuffer_rob_rob_index_out,
     output wire[`LBWidth - 1 : 0] lbuffer_rob_lbuffer_index_out,
-    input wire[`LBCount - 1 : 0] rob_lbuffer_state_in,
+    input wire[`LBWidth - 1 : 0] rob_lbuffer_index_in,
+
+    //to reservation station
+    output wire lbuffer_rs_rdy_out,
 
     //from & to datactrl
     output wire lbuffer_datactrl_en_out,
@@ -28,68 +31,81 @@ module lbuffer(
     input wire datactrl_lbuffer_en_in,
     input wire[`IDWidth - 1 : 0] datactrl_lbuffer_data_in
 );
-    localparam IDLE = 1'b0;
-    localparam BUSY = 1'b1;
+//from 1 to LBCount - 1
 
     reg busy[`LBCount - 1 : 0];
     reg[`AddressWidth - 1 : 0] a[`LBCount - 1 : 0];
     reg[`ROBWidth - 1 : 0] dest[`LBCount - 1 : 0];
     reg[`InstTypeWidth - 1 : 0] opcode[`LBCount - 1 : 0];
-    reg[`LBWidth - 1 : 0] id;
-    reg switch_flag, state;
-    reg[`LBWidth - 1 : 0] load_id;
+    reg[`LBWidth - 1 : 0] idlelist_head;
+    reg[`LBWidth - 1 : 0] idlelist_next[`LBCount - 1 : 0];
+    reg[1 : 0] stage;
+    reg[`LBWidth - 1 : 0] current_load_id, next_load_id;
+
+    localparam IDLE = 2'b00;
+    localparam PENDING = 2'b01;
+    localparam BUSY = 2'b10;
+
+//at posedge:
+//activate the corresponding entry in ROB
+//search for a ready-to-load entry and record to next_load_id
+//execute loading (if IDLE && current_load_id != 0, set stage to PENDING; if BUSY && datactrl_lbuffer_en_in, set to IDLE, pop)
+//receive ready entry from ROB
+//addrunit sends an entry
+
+//during clock cycle
+//if stage is PENDING, link datactrl
+//if stage is BUSY and datactrl_lbuffer_en_in, change idlelist_head
+//if a new entry is sent, change idlelist_head
 
     always @(posedge clk_in) begin
-        switch_flag <= switch_flag ^ 1'b1;
-        lbuffer_rob_en_out <= 1'b0;
         if (rst_in) begin
-            id <= `LBWidth'b0;
-            for (i = 0;i < `LBCount;i = i + 1) busy[i] <= 1'b0;
-        end else if (rdy_in) if (rob_rst_in) begin
-            id <= `LBWidth'b0;
-            for (i = 0;i < `LBCount;i = i + 1) busy[i] <= 1'b0;
+            for (i = 1;i < `LBCount;i = i + 1) busy[i] <= 1'b0;
+            stage <= IDLE;
+            current_load_id <= `LBWidth'b0;
+        end else if (rdy_in) if (rob_lbuffer_rst_in) begin
+            for (i = 1;i < `LBCount;i = i + 1) busy[i] <= 1'b0;
+            stage <= IDLE;
+            current_load_id <= `LBWidth'b0;
         end else begin
+            next_load_id <= `LBWidth'b0;
+            for (i = 1;i < `LBCount;i = i + 1)
+                if (busy[i] && ready[i])
+                    next_load_id <= i;
+            if (stage == PENDING) stage <= BUSY;
+            else if (stage == BUSY) begin
+                if (datactrl_lbuffer_en_in) begin
+                    stage <= IDLE;    
+                    busy[current_load_id] <= 1'b0;
+                    current_load_id <= next_load_id;
+                end
+            end else if (current_load_id != `LBWidth'b0) stage <= PENDING;
+            else current_load_id <= next_load_id;
+            ready[rob_lbuffer_index_in] <= 1'b1;
             if (addrunit_lbuffer_en_in) begin
-                busy[id] <= 1'b1;
-                a[id] <= addrunit_lbuffer_a_in;
-                dest[id] <= addrunit_lbuffer_dest_in;
-                opcode[id] <= addrunit_lbuffer_opcode_in;
-                ready[id] <= 1'b0;
+                busy[idlelist_head] <= 1'b1;
+                a[idlelist_head] <= addrunit_lbuffer_a_in;
+                dest[idlelist_head] <= addrunit_lbuffer_dest_in;
+                opcode[idlelist_head] <= addrunit_lbuffer_opcode_in;
+                ready[idlelist_head] <= 1'b0;
                 lbuffer_rob_en_out <= 1'b1;
                 lbuffer_rob_rob_index_out <= addrunit_lbuffer_dest_in;
-                lbuffer_rob_lbuffer_index_out <= id;
+                lbuffer_rob_lbuffer_index_out <= idlelist_head;
             end
-            if (state == IDLE) begin
-                for (i = 0;i < `LBCount;++ i)
-                    if (busy[i] && ready[i]) begin
-                        state = BUSY;
-                        load_id = i;
-                    end
-            end
-            for (i = 0;i < `LBCount;i = i + 1)
-                if (((rob_lbuffer_state_in >> i) & 1) != `LBCount'b0)
-                    ready[i] <= 1'b1;
         end
     end
 
     always @(*) begin
         if (rst_in) begin
-            for (i = 0;i < `LBCount;i = i + 1) busy[i] = 1'b0;
-            state = IDLE;
-        end if (rdy_in) if (rob_lbuffer_rst_in) begin
-            for (i = 0;i < `LBCount;i = i + 1) busy[i] = 1'b0;
-            state = IDLE;
+            lbuffer_datactrl_en_out = 1'b0;
+            idlelist_head = `LBWidth'b0;
+        end else if (rdy_in) if (rob_lbuffer_rst_in) begin
+            lbuffer_datactrl_en_out = 1'b0;
+            idlelist_head = `LBWidth'b0;
         end else begin
-            if (state == BUSY)
-                if (datactrl_lbuffer_en_in) begin
-                    lbuffer_rob_dest_out = dest[load_id];
-                    lbuffer_rob_value_out = datactrl_lbuffer_data_in;
-                    lbuffer_datactrl_en_out = 1'b0;
-                    busy[load_id] = 1'b0;
-                    state = IDLE;
-                end else begin
+            if (stage == PENDING) begin
                     lbuffer_datactrl_en_out = 1'b1;
-                    lbuffer_datactrl_addr_out = a[load_id];
+                    lbuffer_datactrl_addr_out = a[current_load_id];
                     case (opcode[load_id])
                         `LB: begin
                             lbuffer_datactrl_sgn_out = 1'b1;
@@ -112,7 +128,15 @@ module lbuffer(
                             lbuffer_datactrl_width_out = 3'b010;
                         end
                     endcase
-                end
+            end else if (stage == BUSY && datactrl_lbuffer_en_in) begin
+                lbuffer_rob_dest_out = dest[current_load_id];
+                lbuffer_rob_value_out = datactrl_lbuffer_data_in;
+                lbuffer_datactrl_en_out = 1'b0;
+                idlelist_head = idlelist_next[idlelist_head];
+            end
+            if (addrunit_lbuffer_en_in) idlelist_head = idlelist_next[idlelist_head];
         end
     end
+
+    assign lbuffer_rs_rdy_out = idlelist_head != `LBCount'b0;
 endmodule : lbuffer

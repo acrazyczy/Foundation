@@ -55,14 +55,14 @@ module RS(
     reg[`AddressWidth - 1 : 0] pc[`RSCount - 1 : 0];
     reg[`InstTypeWidth - 1 : 0] opcode[`RSCount - 1 : 0];
     reg[`RSWidth - 1 : 0] id;
-    reg[`RSWidth : 0] ready_to_AddressUnit;
-    reg[`RSWidth : 0] ready_to_ALU;
+    reg[`RSWidth - 1 : 0] ready_to_AddressUnit;
+    reg[`RSWidth - 1 : 0] ready_to_ALU;
     reg in_LS_queue[`RSCount - 1 : 0];
     reg[`RSWidth - 1 : 0] LS_queue[`RSCount - 1 : 0];
     reg[`RSWidth - 1 : 0] head, tail;
     reg switch_flag;
 
-    localparam NRS = {(`RSWidth + 1){1'b1}};
+    localparam NRS = `RSWidth'b0;
 
     always @(posedge clk_in) begin
         switch_flag <= switch_flag ^ 1;
@@ -72,23 +72,21 @@ module RS(
         rs_alu_opcode_out <= `NOP;
         rs_rob_h_out <= `ROBWidth'b0;
         if (rst_in) begin
-            id <= `RSWidth'b0;
-            for (i = 0;i < `RSCount;i = i + 1) begin
+            id <= `RSWidth'b1;
+            for (i = 1;i < `RSCount;i = i + 1) begin
                 busy[i] <= 1'b0;
                 in_LS_queue[i] <= 1'b0;
             end
             head <= `RSWidth'b0;
             tail <= `RSWidth'b0;
-            rs_instqueue_rdy_out = 1'b1;
         end else if (rdy_in) if (rob_rs_rst_in) begin
-            id <= `RSWidth'b0;
-            for (i = 0;i < `RSCount;i = i + 1) begin
+            id <= `RSWidth'b1;
+            for (i = 1;i < `RSCount;i = i + 1) begin
                 busy[i] <= 1'b0;
                 in_LS_queue[i] <= 1'b0;
             end
             head <= `RSWidth'b0;
             tail <= `RSWidth'b0;
-            rs_instqueue_rdy_out = 1'b1;
         end else begin
             if (dispatcher_rs_en_in) begin
                 busy[id] <= 1'b1;
@@ -103,39 +101,49 @@ module RS(
                 if (`LB <= dispatcher_rs_opcode_in && dispatcher_rs_opcode_in <= `SW) begin
                     in_LS_queue[id] = 1'b1;
                     LS_queue[tail] <= id;
-                    tail <= (tail + 1) % `RSCount;
+                    tail <= tail % (`RSCount - 1) + 1;
                 end
+                id <= NRS;
             end
-            for (i = 0;i < `RSCount;i = i + 1)
-                if (`LB <= opcode[i] && opcode[i] <= `LHU) begin
-                    if (qj[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
-                        ready_to_AddressUnit <= i;
-                        rs_addrunit_a_out <= a[i];
-                        rs_addrunit_vj_out <= vj[i];
-                        rs_addrunit_dest_out <= dest[i]
-                        rs_addrunit_opcode_out <= opcode[i];
-                    end
-                end else if (`SB <= opcode[i] && opcode[i] <= `SW) begin
-                    if (qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
-                        ready_to_AddressUnit <= i;
-                        rs_addrunit_a_out <= a[i];
-                        rs_addrunit_vj_out <= vj[i];
-                        rs_addrunit_qk_out <= qk[i];
-                        rs_addrunit_vk_out <= vk[i];
-                        rs_addrunit_dest_out <= dest[i];
-                        rs_addrunit_opcode_out <= opcode[i];
-                    end
-                end else if (`BEQ <= opcode[i] && opcode[i] <= `BGEU || `ADD <= opcode[i] && opcode[i] <= `AND) begin
-                    if (qj[i] == `ROBWidth'b0 && qk[i] == `ROBWidth'b0) begin
-                        ready_to_ALU <= i;
-                        rs_alu_vj_out <= vj[i];
-                        rs_alu_vk_out <= vk[i];
-                        rs_alu_dest_out <= dest[i];
-                        rs_alu_pc_out <= pc[i];
-                        rs_alu_opcode_out <= opcode[i];
-                    end
-                end else if (opcode[i] == `JALR || `ADDI <= opcdoe[i] && opcode[i] <= `SRAI) begin
-                    if (qj[i] == `ROBWidth'b0) begin
+            for (i = 1;i < `RSCount;i = i + 1)
+                if (busy[i])
+                    if (`LB <= opcode[i] && opcode[i] <= `LHU) begin
+                        if (qj[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
+                            ready_to_AddressUnit <= i;
+                            rs_addrunit_a_out <= a[i];
+                            rs_addrunit_vj_out <= vj[i];
+                            rs_addrunit_dest_out <= dest[i];
+                            rs_addrunit_opcode_out <= opcode[i];
+                        end
+                    end else if (`SB <= opcode[i] && opcode[i] <= `SW) begin
+                        if (qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
+                            ready_to_AddressUnit <= i;
+                            rs_addrunit_a_out <= a[i];
+                            rs_addrunit_vj_out <= vj[i];
+                            rs_addrunit_qk_out <= qk[i];
+                            rs_addrunit_vk_out <= vk[i];
+                            rs_addrunit_dest_out <= dest[i];
+                            rs_addrunit_opcode_out <= opcode[i];
+                        end
+                    end else if (`BEQ <= opcode[i] && opcode[i] <= `BGEU || `ADD <= opcode[i] && opcode[i] <= `AND) begin
+                        if (qj[i] == `ROBWidth'b0 && qk[i] == `ROBWidth'b0) begin
+                            ready_to_ALU <= i;
+                            rs_alu_vj_out <= vj[i];
+                            rs_alu_vk_out <= vk[i];
+                            rs_alu_dest_out <= dest[i];
+                            rs_alu_pc_out <= pc[i];
+                            rs_alu_opcode_out <= opcode[i];
+                        end
+                    end else if (opcode[i] == `JALR || `ADDI <= opcdoe[i] && opcode[i] <= `SRAI) begin
+                        if (qj[i] == `ROBWidth'b0) begin
+                            ready_to_ALU <= i;
+                            rs_alu_a_out <= a[i];
+                            rs_alu_vj_out <= vj[i];
+                            rs_alu_dest_out <= dest[i];
+                            rs_alu_pc_out <= pc[i];
+                            rs_alu_opcode_out <= opcode[i];
+                        end
+                    end else if (`LUI <= opcode[i] && opcode[i] <= `JAL) begin
                         ready_to_ALU <= i;
                         rs_alu_a_out <= a[i];
                         rs_alu_vj_out <= vj[i];
@@ -143,58 +151,44 @@ module RS(
                         rs_alu_pc_out <= pc[i];
                         rs_alu_opcode_out <= opcode[i];
                     end
-                end else if (`LUI <= opcode[i] && opcode[i] <= `JAL) begin
-                    ready_to_ALU <= i;
-                    rs_alu_a_out <= a[i];
-                    rs_alu_vj_out <= vj[i];
-                    rs_alu_dest_out <= dest[i];
-                    rs_alu_pc_out <= pc[i];
-                    rs_alu_opcode_out <= opcode[i];
-                end
+                else if (i != id || !dispatcher_rs_en_in) id <= i;
         end
     end
 
-    always @(switch_flag) begin
+    always @(posedge clk_in) begin
         if (!rst_in && rdy_in) begin
             if (ready_to_AddressUnit != NRS)
-                if (`LB <= opcode[ready_to_AddressUnit] && opcode[ready_to_AddressUnit] <= `LHU)
-                    busy[ready_to_AddressUnit] = 1'b0;
-                else begin
-                    in_LS_queue[ready_to_AddresssUnit] = 1'b0;
-                    head = (head + 1) % `RSCount;
+                if (`LB <= opcode[ready_to_AddressUnit] && opcode[ready_to_AddressUnit] <= `LHU) begin
+                    busy[ready_to_AddressUnit] <= 1'b0;
+                    id <= ready_to_AddressUnit;
+                end else begin
+                    in_LS_queue[ready_to_AddresssUnit] <= 1'b0;
+                    head <= head % (`RSCount - 1) + 1;
                 end
             if (ready_to_ALU != NRS) busy[ready_to_ALU] = 1'b0;
-            rs_instqueue_rdy_out = 1'b0;
-            for (i = 0;i < `RSCount;i = i + 1)
-                if (!busy[i]) begin
-                    id = i;
-                    rs_instqueue_rdy_out = 1'b1;
-                end
         end
     end
 
     always @(*) begin
         if (rst_in) begin
-            id = `RSWidth'b0;
-            for (i = 0;i < `RSCount;i = i + 1) begin
+            id = `RSWidth'b1;
+            for (i = 1;i < `RSCount;i = i + 1) begin
                 busy[i] = 1'b0;
                 in_LS_queue[i] = 1'b0;
             end
             head = `RSWidth'b0;
             tail = `RSWidth'b0;
-            rs_instqueue_rdy_out = 1'b1;
         end else if (rdy_in) if (rob_rs_rst_in) begin
-            id = `RSWidth'b0;
-            for (i = 0;i < `RSCount;i = i + 1) begin
+            id = `RSWidth'b1;
+            for (i = 1;i < `RSCount;i = i + 1) begin
                 busy[i] = 1'b0;
                 in_LS_queue[i] = 1'b0;
             end
             head = `RSWidth'b0;
             tail = `RSWidth'b0;
-            rs_instqueue_rdy_out = 1'b1;
         end else begin
             if (cdb_rs_en) begin
-                for (i = 0;i < `RSCount;i = i + 1) begin
+                for (i = 1;i < `RSCount;i = i + 1) begin
                     if (qj[i] == cdb_rs_b_in) begin
                         vj[i] = cdb_rs_result_in;
                         qj[i] = `ROBWidth'b0;
@@ -205,16 +199,19 @@ module RS(
                     end
                 end
             end
-            for (i = 0;i < `RSCount;i = i + 1)
+            for (i = 1;i < `RSCount;i = i + 1)
                 if (`SB <= opcode[i] && opcode[i] <= `SW && qk[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
                     rs_rob_h_out = dest[i];
                     rs_rob_value_out = vk[i];
                     busy[i] = 1'b0;
+                    id = i;
                 end
             while (head != tail && `LB <= opcode[LS_queue[head]] && opcode[LS_queue[head]] <= `LHU) begin
                 in_LS_queue[LS_queue[head]] = 1'b0;
-                head = (head + 1) % `RSCount;
+                head = head % (`RSCount - 1) + 1;
             end
         end
     end
+
+    assign rs_instqueue_rdy_out = id != NRS;
 endmodule : RS

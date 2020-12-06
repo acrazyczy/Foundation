@@ -9,6 +9,7 @@ module instqueue(
     input wire if_instqueue_en_in,
     input wire[`IDWidth - 1 : 0] if_instqueue_inst_in,
     input wire [`AddressWidth - 1 : 0] if_instqueue_pc_in,
+    output wire instqueue_if_rdy_out,
 
     //from reservation station
     input wire rs_instqueue_rdy_in,
@@ -66,5 +67,7 @@ module instqueue(
             end
         end
     end
+
+    assign instqueue_if_rdy_out = head != (tail + 1) % QueueCount;
 
 endmodule : instqueue
