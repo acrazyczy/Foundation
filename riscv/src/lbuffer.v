@@ -75,11 +75,13 @@ module lbuffer(
             if (stage == PENDING) stage <= BUSY;
             else if (stage == BUSY) begin
                 if (datactrl_lbuffer_en_in) begin
-                    stage <= IDLE;    
-                    busy[current_load_id] <= 1'b0;
+                    stage <= IDLE;
                     current_load_id <= next_load_id;
                 end
-            end else if (current_load_id != `LBWidth'b0) stage <= PENDING;
+            end else if (current_load_id != `LBWidth'b0) begin
+                busy[current_load_id] <= 1'b0;
+                stage <= PENDING;
+            end
             else current_load_id <= next_load_id;
             ready[rob_lbuffer_index_in] <= 1'b1;
             if (addrunit_lbuffer_en_in) begin
@@ -91,7 +93,7 @@ module lbuffer(
                 lbuffer_rob_en_out <= 1'b1;
                 lbuffer_rob_rob_index_out <= addrunit_lbuffer_dest_in;
                 lbuffer_rob_lbuffer_index_out <= idlelist_head;
-            end
+            end else lbuffer_rob_en_out <= 1'b0;
         end
     end
 
@@ -103,10 +105,11 @@ module lbuffer(
             lbuffer_datactrl_en_out = 1'b0;
             idlelist_head = `LBWidth'b0;
         end else begin
+            if (busy[idlelist_head]) idlelist_head = idlelist_next[idlelist_head];
             if (stage == PENDING) begin
                     lbuffer_datactrl_en_out = 1'b1;
                     lbuffer_datactrl_addr_out = a[current_load_id];
-                    case (opcode[load_id])
+                    case (opcode[current_load_id])
                         `LB: begin
                             lbuffer_datactrl_sgn_out = 1'b1;
                             lbuffer_datactrl_width_out = 3'b001;
@@ -132,9 +135,9 @@ module lbuffer(
                 lbuffer_rob_dest_out = dest[current_load_id];
                 lbuffer_rob_value_out = datactrl_lbuffer_data_in;
                 lbuffer_datactrl_en_out = 1'b0;
-                idlelist_head = idlelist_next[idlelist_head];
+                idlelist_next[current_load_id] = idlelist_head;
+                idlelist_head = current_load_id;
             end
-            if (addrunit_lbuffer_en_in) idlelist_head = idlelist_next[idlelist_head];
         end
     end
 

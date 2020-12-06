@@ -1,4 +1,4 @@
-`include "constant.vh"
+`include "contant.vh"
 
 module icache(
     input wire clk_in,
@@ -8,61 +8,52 @@ module icache(
     //from & to instruction fetch
     input wire if_icache_en_in,
     input wire if_icache_inst_addr_in,
-    output wire icache_if_rdy_out,
     output wire icache_if_miss_out,
     output wire[`IDWidth - 1 : 0] icache_if_inst_inst_out,
 
     //from & to ramctrl
-    output wire icache_ramctrl_en_i,
-    input wire ramctrl_icache_inst_rdy_o,
-    output wire[`AddressWidth - 1 : 0] icache_ramctrl_addr_i,
-    input wire[`IDWidth - 1 : 0] ramctrl_icache_inst_inst_o
+    output wire icache_ramctrl_en_out,
+    input wire ramctrl_icache_inst_rdy_in,
+    output wire[`AddressWidth - 1 : 0] icache_ramctrl_addr_out,
+    input wire[`IDWidth - 1 : 0] ramctrl_icache_inst_inst_in
 );
 //1 KiB i-cache
 
     localparam IndexWidth = 8;
     localparam IndexCount = 256;
+    localparam TagWidth = 22;
+    localparam TagCount = 
     localparam ByteSelectWidth = 2;
     localparam ByteSelectCount = 4;
-    localparam TagWidth = `IDWidth - IndexWidth - ByteSelectWidth;
-    localparam EntryWidth = TagWidth + 8 * ByteSelectCount;
+    localparam BlockWidth = ;
+    localparam IDLE = 1'b0;
+    localparam BUSY = 1'b1;
 
-    reg[EntryWidth - 1 : 0] cache[IndexCount - 1 : 0];
+    reg[TagWidth - 1 : 0] tag[IndexCount - 1 : 0];
+    reg[BlockWidth - 1 : 0] value[IndexCount - 1 : 0];
     reg valid[IndexCount - 1 : 0];
     reg state;
+    wire real_miss;
 
-    always @(*) begin
+    always @(posedge clk_in) begin
         if (rst_in) begin
-            icache_if_rdy_out = 1'b1;
-            icache_ramctrl_en_i = 1'b0;
-            for (i = 0;i < IndexCount;i = i + 1) begin
-                cache[i] = 0;
-                valid[i] = 1'b0;
-            end
-            state = 1'b0;
+            state = IDLE;
+            for (i = 0;i < IndexCount;i = i + 1) valid[i] = 
         end else if (rdy_in) begin
-            if (state) begin
-                if (ramctrl_icache_inst_rdy_o) begin
-                    state = 1'b0;
-                    icache_if_rdy_out = 1'b1;
-                    valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (IndexCount - 1)] = 1'b1;
-                    cache[(if_icache_inst_addr_in >> ByteSelectWidth) & (IndexCount - 1)] = {if_icache_inst_addr_in >> (`IDWidth - TagWidth), ramctrl_icache_inst_inst_o};
-                end
-            end
-            if (if_icache_en_in) begin
-                if (valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (IndexCount - 1)] && (cache[(if_icache_inst_addr_in >> ByteSelectWidth) & (IndexCount - 1)] >> (EntryWidth - TagWidth)) == (if_icache_inst_addr_in >> (`IDWidth - TagWidth))) begin
-                    icache_if_miss_out = 1'b0;
-                    icache_if_inst_inst_out = cache[(if_icache_inst_addr_in >> ByteSelectWidth) & (IndexCount - 1)] & ((1 << (EntryWidth - TagWidth)) - 1);
-                end else begin
-                    icache_if_miss_out = 1'b1;
-                    if (!state) begin
-                        state = 1'b1;
-                        icache_if_rdy_out = 1'b0;
-                        icache_ramctrl_en_i = 1'b1;
-                        icache_ramctrl_addr_i = if_icache_inst_addr_in;
-                    end
-                end
+            if (state == IDLE && icache_ramctrl_en_in) state = BUSY;
+            else if (state == BUSY && ramctrl_icache_inst_rdy_in) begin
+                state = IDLE;
+                tag[(icache_ramctrl_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= if_icache_inst_addr_in >> IndexWidth + ByteSelectWidth;
+                valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= 1'b1;
+                value[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= ramctrl_icache_inst_inst_in;
             end
         end
     end
+
+    assign real_miss = !valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] || tag[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] != if_icache_inst_addr_in >> IndexWidth + ByteSelectWidth;
+    assign icache_if_miss_out = state == BUSY || real_miss;
+    assign icache_if_inst_inst_out = value[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1];
+    assign icache_ramctrl_en_in = state == BUSY || real_miss;
+    assign icache_ramctrl_addr_in = state == BUSY ? icache_ramctrl_en_in: if_icache_inst_addr_in;
+
 endmodule : icache

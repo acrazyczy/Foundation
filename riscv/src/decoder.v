@@ -12,18 +12,19 @@ module decoder(
     output wire decoder_instqueue_rst_out,
 
     //to instruction fetch
-    output reg decoder_if_en_out,
-    output reg[`AddressWidth - 1 : 0] decoder_if_addr_out,
+    output wire decoder_if_en_out,
+    output wire[`AddressWidth - 1 : 0] decoder_if_addr_out,
 
     //to branch predictor
-    output reg decoder_bp_en_out,
-    output reg[`AddressWidth - 1 : 0] decoder_bp_pc_out,
+    output wire decoder_bp_en_out,
+    output wire[`AddressWidth - 1 : 0] decoder_bp_pc_out,
 
     //to dispatcher
-    output reg[`RegWidth - 1 : 0] decoder_dispatcher_rs_out, decoder_dispatcher_rt_out, decoder_dispatcher_rd_out,
-    output reg[`IDWidth - 1 : 0] decoder_dispatcher_imm_out,
-    output reg[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode_out,
-    output reg[`AddressWidth - 1 : 0] decoder_dispatcher_pc_out
+    output wire decoder_dispatcher_en_out,
+    output wire[`RegWidth - 1 : 0] decoder_dispatcher_rs_out, decoder_dispatcher_rt_out, decoder_dispatcher_rd_out,
+    output wire[`IDWidth - 1 : 0] decoder_dispatcher_imm_out,
+    output wire[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode_out,
+    output wire[`AddressWidth - 1 : 0] decoder_dispatcher_pc_out
 );
 
     always @(*) begin
@@ -35,7 +36,7 @@ module decoder(
             decoder_dispatcher_pc_out = instqueue_decoder_pc_in;
             decoder_bp_en_out = 1'b0;
             decoder_if_en_out = 1'b0;
-            case (instqueue_decoder_inst_in & `IDWidth'h127)
+            case (instqueue_decoder_inst_in & `IDWidth'd127)
                 51: begin
                     decoder_dispatcher_rs_out = instqueue_decoder_inst_in[19 : 15];
                     decoder_dispatcher_rt_out = instqueue_decoder_inst_in[24 : 20];
@@ -135,5 +136,7 @@ module decoder(
             endcase
         end
     end
+
+    assign decoder_dispatcher_en_out = instqueue_decoder_en_in;
 
 endmodule : decoder

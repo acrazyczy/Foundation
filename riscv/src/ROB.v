@@ -145,9 +145,19 @@ module rob(
                     busy[head] <= 1'b0;
                     head <= head % (`ROBCount - 1) + 1;
                 end
-            if (alu_rob_h_in != `ROBWidth'b0) value[alu_rob_h_in] <= alu_rob_result_in;
+            if (alu_rob_h_in != `ROBWidth'b0) begin
+                value[alu_rob_h_in] <= alu_rob_result_in;
+                ready[alu_rob_h_in] <= 1'b1;
+            end
             if (addrunit_rob_h_in != `ROBWidth'b0) address[addrunit_rob_h_in] <= alu_rob_result_in;
-            if (lbuffer_rob_h_in != `ROBWidth'b0) value[lbuffer_rob_h_in] <= lbuffer_rob_value_in;
+            if (lbuffer_rob_h_in != `ROBWidth'b0) begin
+                value[lbuffer_rob_h_in] <= lbuffer_rob_value_in;
+                ready[lbuffer_rob_h_in] <= 1'b1;
+            end
+            if (rs_rob_h_in != `ROBWidth'b0) begin
+                value[rs_rob_h_in] <= rs_rob_value_in;
+                ready[rs_rob_h_in] <= 1'b1;
+            end
             deactivated_rob <= `LBWidth'b0;
             for (i = head;i != tail;i = i % (`ROBCount - 1) + 1)
                 if (busy[i] && activated[i] && occupation[i] == `ROBWidth'b0)
@@ -174,9 +184,10 @@ module rob(
                     if (activated[i] && address[i] == address[head])
                         occupation[i] = occupation[i] - 1;
             if (lbuffer_rob_en_in) begin
-                activaed[lbuffer_rob_en_in] = 1'b1;
+                activaed[lbuffer_rob_rob_index_in] = 1'b1;
                 occupation[lbuffer_rob_rob_index_in] = `ROBWidth'b0;
                 index[lbuffer_rob_rob_index_in] = lbuffer_rob_lbuffer_index_in;
+                occupation[lbuffer_rob_rob_index_in] = `ROBWidth'b0;
                 for (i = head;i != lbuffer_rob_rob_index_in;i = i % `ROBCount + 1)
                     if (`SB <= opcode[i] && opcode[i] <= `SW && address[i] == address[lbuffer_rob_rob_index_in])
                         occupation[lbuffer_rob_rob_index_in] = occupation[lbuffer_rob_rob_index_in] + 1;

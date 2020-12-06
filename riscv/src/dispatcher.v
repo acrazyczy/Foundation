@@ -6,6 +6,7 @@ module dispatcher(
     input wire rdy_in,
 
     //from decoder
+    input wire decoder_dispatcher_en_in,
     input wire[`RegWidth - 1 : 0] decoder_dispatcher_rs_in, decoder_dispatcher_rt_in, decoder_dispatcher_rd_in,
     input wire[`IDWidth - 1 : 0] decoder_dispatcher_imm_in,
     input wire[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode_in,
@@ -58,11 +59,7 @@ module dispatcher(
             dispatcher_regfile_rd_en_out = 1'b0;
             dispatcher_rs_en_out = 1'b0;
             dispatcher_rob_en_out = 1'b0;
-        end else if (rdy_in && decoder_dispatcher_opcode_in != `NOP) begin
-            dispatcher_rs_pc_out = decoder_dispatcher_pc_in;
-            dispatcher_rob_pc_out = decoder_dispatcher_pc_in;
-            dispatcher_rob_taken_out = bp_dispatcher_taken_in;
-
+        end else if (rdy_in && decoder_dispatcher_en_in) begin
             dispatcher_regfile_rs_out = decoder_dispatcher_rs_in;
             if (regfile_dispatcher_rs_busy_in) begin
                 dispatcher_rob_rs_h_out = regfile_dispatcher_rs_reorder_in;
@@ -74,9 +71,6 @@ module dispatcher(
                 dispatcher_rs_vj_out = regfile_dispatcher_rs_in;
                 dispatcher_rs_qj_out = `ROBWidth'b0;
             end
-            dispatcher_rs_dest_out = rob_dispatcher_b_in;
-            dispatcher_rob_opcode_out = decoder_dispatcher_opcode_in;
-            dispatcher_rob_dest_out = decoder_dispatcher_rd_in;
 
             dispatcher_regfile_rt_out = decoder_dispatcher_rt_in;
             if (regfile_dispatcher_rt_busy_in) begin
@@ -89,12 +83,20 @@ module dispatcher(
                 dispatcher_rs_vk_out = regfile_dispatcher_rt_in;
                 dispatcher_rs_qk_out = `ROBWidth'b0;
             end
-
-            dispatcher_rs_a_out = decoder_dispatcher_imm_in;
-            dispatcher_regfile_reorder_out = rob_dispatcher_b_in;
-            dispatcher_rob_dest_out = decoder_dispatcher_rd_in;
-            dispatcher_rs_opcode_out = decoder_dispatcher_opcode_in;
         end
     end
+
+    assign dispatcher_rs_en_out = decoder_dispatcher_en_in;
+    assign dispatcher_rs_pc_out = decoder_dispatcher_pc_in;
+    assign dispatcher_rs_dest_out = rob_dispatcher_b_in;
+    assign dispatcher_rob_pc_out = decoder_dispatcher_pc_in;
+    assign dispatcher_rob_taken_out = bp_dispatcher_taken_in;
+    assign dispatcher_rs_a_out = decoder_dispatcher_imm_in;
+    assign dispatcher_regfile_rd_en_out = decoder_dispatcher_en_in && !(`BEQ <= decoder_dispatcher_opcode_in && decoder_dispatcher_opcode_in <= `BGEU) && !(`SB <= decoder_dispatcher_opcode_in && decoder_dispatcher_opcode_in <= `SW);
+    assign dispatcher_regfile_reorder_out = rob_dispatcher_b_in;
+    assign dispatcher_regfile_rd_out = decoder_dispatcher_rd_in;
+    assign dispatcher_rob_dest_out = decoder_dispatcher_rd_in;
+    assign dispatcher_rob_opcode_out = decoder_dispatcher_opcode_in;
+    assign dispatcher_rs_opcode_out = decoder_dispatcher_opcode_in;
 
 endmodule : dispatcher
