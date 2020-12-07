@@ -24,7 +24,7 @@ module RS(
 
     //from & to reorder buffer
     output wire[`ROBWidth - 1 : 0] rs_rob_h_out,
-    output wire[`IDWidth - 1 : 0] rs_rob_value_out,
+    output wire[`IDWidth - 1 : 0] rs_rob_result_out,
     input wire rob_rs_rst_in,
 
     //to addresss unit
@@ -143,7 +143,7 @@ module RS(
                         if (qk[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
                             ready_to_rob <= i;
                             rs_rob_h_out <= dest[i];
-                            rs_rob_value_out <= vk[i];
+                            rs_rob_result_out <= vk[i];
                             busy[i] <= 1'b0;
                         end else if (qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
                             ready_to_addrunit <= i;
@@ -187,7 +187,7 @@ module RS(
 
     always @(*) begin
         if (rst_in) begin
-            idlelist_head = `RSWitth'b0;
+            idlelist_head = `RSWidth'b0;
             head = `RSCount'b0;
             tail = `RSCount'b0;
             for (i = 1;i < `RSCount'b0;i = i + 1) in_LS_queue[i] = 1'b0;

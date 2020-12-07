@@ -5,7 +5,7 @@ module decoder(
     input wire rst_in,
     input wire rdy_in,
 
-    //from & to instqueue
+    //from & to instruction queue
     input wire instqueue_decoder_en_in,
     input wire[`IDWidth - 1 : 0] instqueue_decoder_inst_in,
     input wire[`AddressWidth - 1 : 0] instqueue_decoder_pc_in,
@@ -14,6 +14,7 @@ module decoder(
     //to instruction fetch
     output wire decoder_if_en_out,
     output wire[`AddressWidth - 1 : 0] decoder_if_addr_out,
+    output wire[`AddressWidth - 1 : 0] decoder_bp_target_out,
 
     //to branch predictor
     output wire decoder_bp_en_out,
@@ -104,7 +105,7 @@ module decoder(
                 99: begin
                     decoder_dispatcher_rs_out = instqueue_decoder_inst_in[19 : 15];
                     decoder_dispatcher_rt_out = instqueue_decoder_inst_in[24 : 20];
-                    decoder_dispatcher_imm_out = $signed({instqueue_decoder_inst_in[31], instqueue_decoder_inst_in[7], instqueue_decoder_inst_in[30 : 25], instqueue_decoder_inst_in[11 : 8], 1'b0})
+                    decoder_dispatcher_imm_out = $signed({instqueue_decoder_inst_in[31], instqueue_decoder_inst_in[7], instqueue_decoder_inst_in[30 : 25], instqueue_decoder_inst_in[11 : 8], 1'b0});
                     case (instqueue_decoder_inst_in[14 : 12])
                         3'b000: decoder_dispatcher_opcode_out = BEQ;
                         3'b001: decoder_dispatcher_opcode_out = BNE;
@@ -113,6 +114,7 @@ module decoder(
                         3'b110: decoder_dispatcher_opcode_out = BLTU;
                         3'b111: decoder_dispatcher_opcode_out = BGEU;
                     endcase
+                    decoder_bp_target_out = instqueue_decoder_pc_in + decoder_dispatcher_imm_out;
                     decoder_bp_en_out = 1'b1;
                     decoder_bp_pc_out = instqueue_decoder_pc_in;
                 end

@@ -14,7 +14,7 @@ module lbuffer(
     //from & to reorder buffer
     input wire rob_lbuffer_rst_in,
     output wire[`ROBWidth - 1 : 0] lbuffer_rob_h_out,
-    output wire[`IDWidth - 1 : 0] lbuffer_rob_value_out,
+    output wire[`IDWidth - 1 : 0] lbuffer_rob_result_out,
     output wire lbuffer_rob_en_out,
     output wire[`ROBWidth - 1 : 0] lbuffer_rob_rob_index_out,
     output wire[`LBWidth - 1 : 0] lbuffer_rob_lbuffer_index_out,
@@ -132,8 +132,8 @@ module lbuffer(
                         end
                     endcase
             end else if (stage == BUSY && datactrl_lbuffer_en_in) begin
-                lbuffer_rob_dest_out = dest[current_load_id];
-                lbuffer_rob_value_out = datactrl_lbuffer_data_in;
+                lbuffer_rob_h_out = dest[current_load_id];
+                lbuffer_rob_result_out = datactrl_lbuffer_data_in;
                 lbuffer_datactrl_en_out = 1'b0;
                 idlelist_next[current_load_id] = idlelist_head;
                 idlelist_head = current_load_id;

@@ -1,4 +1,4 @@
-`include "contant.vh"
+`include "constant.vh"
 
 module icache(
     input wire clk_in,
@@ -22,10 +22,9 @@ module icache(
     localparam IndexWidth = 8;
     localparam IndexCount = 256;
     localparam TagWidth = 22;
-    localparam TagCount = 
     localparam ByteSelectWidth = 2;
     localparam ByteSelectCount = 4;
-    localparam BlockWidth = ;
+    localparam BlockWidth = 32;
     localparam IDLE = 1'b0;
     localparam BUSY = 1'b1;
 
@@ -38,7 +37,7 @@ module icache(
     always @(posedge clk_in) begin
         if (rst_in) begin
             state = IDLE;
-            for (i = 0;i < IndexCount;i = i + 1) valid[i] = 
+            for (i = 0;i < IndexCount;i = i + 1) valid[i] = 1'b0;
         end else if (rdy_in) begin
             if (state == IDLE && icache_ramctrl_en_in) state = BUSY;
             else if (state == BUSY && ramctrl_icache_inst_rdy_in) begin

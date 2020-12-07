@@ -207,7 +207,7 @@ module ram_controller(
                     WDATA: begin
                         ram_rw_out = 1'b1;
                         ram_addr_out = data_addr_in + 32'h2;
-                        ram_data_out = data_data_in[23 : 16]
+                        ram_data_out = data_data_in[23 : 16];
                     end
                 endcase
             S3: case (current_rw_state)

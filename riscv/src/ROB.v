@@ -1,6 +1,6 @@
 `include "constant.vh"
 
-module rob(
+module ROB(
     input wire clk_in,
     input wire rst_in,
     input wire rdy_in,
@@ -41,7 +41,7 @@ module rob(
 
     //from & to load buffer
     input wire[`ROBWidth - 1 : 0] lbuffer_rob_h_in,
-    input wire[`IDWidth - 1 : 0] lbuffer_rob_value_in,
+    input wire[`IDWidth - 1 : 0] lbuffer_rob_result_in,
     input wire lbuffer_rob_en_in,
     input wire[`ROBWidth - 1 : 0] lbuffer_rob_rob_index_in,
     input wire[`LBWidth - 1 : 0] lbuffer_rob_lbuffer_index_in,
@@ -55,14 +55,14 @@ module rob(
 
     //from & to reservation station
     input wire[`ROBWidth - 1 : 0] rs_rob_h_in,
-    input wire[`IDWidth - 1 : 0] rs_rob_value_in,
+    input wire[`IDWidth - 1 : 0] rs_rob_result_in,
 
     //from & to datactrl
     output wire rob_datactrl_en_out,
     output wire[`AddressWidth - 1 : 0] rob_datactrl_addr_out,
     output wire[2 : 0] rob_datactrl_width_out,
     output wire[`IDWidth - 1 : 0] rob_datactrl_data_out,
-    input wire datactrl_rob_en_in,
+    input wire datactrl_rob_en_in
 );
 //from 1 to ROBCount - 1
 
@@ -151,11 +151,11 @@ module rob(
             end
             if (addrunit_rob_h_in != `ROBWidth'b0) address[addrunit_rob_h_in] <= alu_rob_result_in;
             if (lbuffer_rob_h_in != `ROBWidth'b0) begin
-                value[lbuffer_rob_h_in] <= lbuffer_rob_value_in;
+                value[lbuffer_rob_h_in] <= lbuffer_rob_result_in;
                 ready[lbuffer_rob_h_in] <= 1'b1;
             end
             if (rs_rob_h_in != `ROBWidth'b0) begin
-                value[rs_rob_h_in] <= rs_rob_value_in;
+                value[rs_rob_h_in] <= rs_rob_result_in;
                 ready[rs_rob_h_in] <= 1'b1;
             end
             deactivated_rob <= `LBWidth'b0;
@@ -204,4 +204,4 @@ module rob(
     assign rob_dispatcher_b_out = tail;
     assign rob_lbuffer_index_out = index[deactivated_rob];
 
-endmodule : rob
+endmodule : ROB
