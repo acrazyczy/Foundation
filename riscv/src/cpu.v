@@ -162,7 +162,7 @@ wire[`AddressWidth - 1 : 0] dispatcher_rob_pc;
 wire dispatcher_rob_taken;
 
 // icache <-> instruction fetch
-wire if_icache_inst_addr;
+wire[`AddressWidth - 1 : 0] if_icache_inst_addr;
 wire icache_if_miss;
 wire[`IDWidth - 1 : 0] icache_if_inst_inst;
 
@@ -408,7 +408,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.decoder_if_en_in       (decoder_if_en),
 		.decoder_if_addr_in       (decoder_if_addr),
 
-		.rob_if_en_in           (rob_if_en),
+		.rob_if_en_in           (rob_rst),
 		.rob_if_pc_in           (rob_if_pc)
 	);
 

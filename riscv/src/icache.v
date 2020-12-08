@@ -6,7 +6,7 @@ module icache(
 	input wire rdy_in,
 
 	//from & to instruction fetch
-	input wire if_icache_inst_addr_in,
+	input wire[`AddressWidth - 1 : 0] if_icache_inst_addr_in,
 	output wire icache_if_miss_out,
 	output wire[`IDWidth - 1 : 0] icache_if_inst_inst_out,
 
@@ -39,20 +39,20 @@ module icache(
 			state = IDLE;
 			for (i = 0;i < IndexCount;i = i + 1) valid[i] = 1'b0;
 		end else if (rdy_in) begin
-			if (state == IDLE && icache_ramctrl_en_in) state = BUSY;
+			if (state == IDLE && icache_ramctrl_en_out) state = BUSY;
 			else if (state == BUSY && ramctrl_icache_inst_rdy_in) begin
 				state = IDLE;
-				tag[(icache_ramctrl_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= if_icache_inst_addr_in >> IndexWidth + ByteSelectWidth;
+				tag[(icache_ramctrl_addr_out >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= if_icache_inst_addr_in >> IndexWidth + ByteSelectWidth;
 				valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= 1'b1;
 				value[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= ramctrl_icache_inst_inst_in;
 			end
 		end
 	end
 
-	assign real_miss = !valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] || tag[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] != if_icache_inst_addr_in >> IndexWidth + ByteSelectWidth;
+	assign real_miss = !valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] || tag[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] != (if_icache_inst_addr_in >> IndexWidth + ByteSelectWidth);
 	assign icache_if_miss_out = state == BUSY || real_miss;
 	assign icache_if_inst_inst_out = value[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1];
-	assign icache_ramctrl_en_in = state == BUSY || real_miss;
-	assign icache_ramctrl_addr_in = state == BUSY ? icache_ramctrl_en_in: if_icache_inst_addr_in;
+	assign icache_ramctrl_en_out = state == BUSY && !ramctrl_icache_inst_rdy_in || state == IDLE && real_miss;
+	assign icache_ramctrl_addr_out = state == BUSY ? icache_ramctrl_addr_out: if_icache_inst_addr_in;
 
 endmodule : icache

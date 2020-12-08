@@ -12,7 +12,7 @@ module decoder(
 	output reg decoder_instqueue_rst_out,
 
 	//to instruction fetch
-	output reg decoder_if_en_out,
+	output wire decoder_if_en_out,
 	output reg[`AddressWidth - 1 : 0] decoder_if_addr_out,
 
 	//to branch predictor
@@ -30,13 +30,11 @@ module decoder(
 
 	always @(*) begin
 		if (rst_in) begin
-			decoder_if_en_out = 1'b0;
 			decoder_bp_en_out = 1'b0;
 			decoder_dispatcher_opcode_out = `NOP;
-		end else if (rdy_in) begin
+		end else if (rdy_in && instqueue_decoder_en_in) begin
 			decoder_dispatcher_pc_out = instqueue_decoder_pc_in;
 			decoder_bp_en_out = 1'b0;
-			decoder_if_en_out = 1'b0;
 			case (instqueue_decoder_inst_in & `IDWidth'd127)
 				51: begin
 					decoder_dispatcher_rs_out = instqueue_decoder_inst_in[19 : 15];
@@ -122,7 +120,6 @@ module decoder(
 					decoder_dispatcher_rd_out = instqueue_decoder_inst_in[11 : 7];
 					decoder_dispatcher_opcode_out = `JAL;
 					decoder_instqueue_rst_out = 1'b1;
-					decoder_if_en_out = 1'b1;
 					decoder_if_addr_out = $signed({instqueue_decoder_inst_in[31], instqueue_decoder_inst_in[19 : 12], instqueue_decoder_inst_in[20], instqueue_decoder_inst_in[30 : 25], instqueue_decoder_inst_in[24 : 21], 1'b0}) + instqueue_decoder_pc_in;
 				end
 				23: begin
@@ -139,6 +136,7 @@ module decoder(
 		end
 	end
 
+	assign decoder_if_en_out = !rst_in && instqueue_decoder_en_in && ((instqueue_decoder_inst_in & `IDWidth'd127) == 111);
 	assign decoder_dispatcher_en_out = instqueue_decoder_en_in;
 
 endmodule : decoder

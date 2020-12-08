@@ -8,7 +8,7 @@ module IF(
 	//from & to icache
 	input wire icache_if_miss_in,
 	input wire[`IDWidth - 1 : 0] icache_if_inst_inst_in,
-	output reg if_icache_inst_addr_out,
+	output reg[`AddressWidth - 1 : 0] if_icache_inst_addr_out,
 
 	//from & to instruction queue
 	output reg if_instqueue_en_out,

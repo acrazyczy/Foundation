@@ -14,7 +14,7 @@ module BP(
 	output reg bp_instqueue_rst_out,
 
 	//to instruction fetch
-	output reg bp_if_en_out,
+	output wire bp_if_en_out,
 	output reg[`AddressWidth - 1 : 0] bp_if_pc_out,
 
 	//to dispatcher
@@ -36,12 +36,10 @@ module BP(
 		end else if (rdy_in) begin
 			if (decoder_bp_en_in) begin
 				if (prediction[(decoder_bp_pc_in >> 2) & mask] > 2'b01) begin
-					bp_if_en_out = 1'b1;
 					bp_if_pc_out = decoder_bp_target_in;
 					bp_dispatcher_taken_out = 1'b1;
 					bp_instqueue_rst_out = 1'b1;
 				end else begin
-					bp_if_en_out = 1'b0;
 					bp_if_pc_out = decoder_bp_pc_in + 4;
 					bp_dispatcher_taken_out = 1'b0;
 					bp_instqueue_rst_out = 1'b0;
@@ -54,4 +52,6 @@ module BP(
 					prediction[(rob_bp_pc_in >> 2) & mask] = prediction[(rob_bp_pc_in >> 2) & mask] ^ 1 ^ ((^ prediction[(rob_bp_pc_in >> 2) & mask]) << 1);
 		end
 	end
+
+	assign bp_if_en_out = !rst_in && decoder_bp_en_in && prediction[(decoder_bp_pc_in >> 2) & mask];
 endmodule : BP

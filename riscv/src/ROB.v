@@ -99,6 +99,7 @@ module ROB(
 //deactivate
 
 	always @(posedge clk_in) begin
+		rob_rst_out <= 1'b0;
 		if (rst_in) begin
 			head <= `ROBWidth'b1;
 			tail <= `ROBWidth'b1;
