@@ -85,7 +85,7 @@ wire[`AddressWidth - 1 : 0] rob_bp_pc;
 wire rob_datactrl_en;
 wire[2 : 0] rob_datactrl_width;
 wire[`AddressWidth - 1 : 0] rob_datactrl_addr;
-wire[`IDWidth - 1 : 0] datactrl_rob_data;
+wire[`IDWidth - 1 : 0] rob_datactrl_data;
 wire datactrl_rob_en;
 
 // datactrl <-> load buffer
@@ -115,10 +115,6 @@ wire decoder_instqueue_rst;
 // decoder <-> instruction fetch
 wire decoder_if_en;
 wire[`AddressWidth - 1 : 0] decoder_if_addr;
-
-// decoder <-> branch predictor
-wire decoder_bp_en;
-wire[`AddressWidth - 1 : 0] decoder_bp_pc;
 
 // decoder <-> dispatcher
 wire decoder_dispatcher_en;
@@ -166,7 +162,6 @@ wire[`AddressWidth - 1 : 0] dispatcher_rob_pc;
 wire dispatcher_rob_taken;
 
 // icache <-> instruction fetch
-wire if_icache_en;
 wire if_icache_inst_addr;
 wire icache_if_miss;
 wire[`IDWidth - 1 : 0] icache_if_inst_inst;
@@ -182,10 +177,6 @@ wire if_instqueue_en;
 wire[`IDWidth - 1 : 0] if_instqueue_inst;
 wire[`AddressWidth - 1 : 0] if_instqueue_pc;
 wire instqueue_if_rdy;
-
-// instruction fetch <-> decoder
-wire decoder_if_en;
-wire[`AddressWidth - 1 : 0] decoder_if_pc;
 
 // instruction fetch <-> reorder buffer
 wire rob_if_en;
@@ -285,7 +276,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.rob_datactrl_en_in             (rob_datactrl_en),
 		.rob_datactrl_width_in          (rob_datactrl_width),
 		.rob_datactrl_addr_in           (rob_datactrl_addr),
-		.datactrl_rob_data_out          (datactrl_rob_data),
+		.rob_datactrl_data_in           (rob_datactrl_data),
 		.datactrl_rob_en_out            (datactrl_rob_en),
 
 		.lbuffer_datactrl_en_in         (lbuffer_datactrl_en),
@@ -317,8 +308,8 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 
 		.decoder_if_en_out            (decoder_if_en),
 		.decoder_if_addr_out          (decoder_if_addr),
-		.decoder_bp_target_out        (decoder_bp_target),
 
+		.decoder_bp_target_out        (decoder_bp_target),
 		.decoder_bp_en_out            (decoder_bp_en),
 		.decoder_bp_pc_out            (decoder_bp_pc),
 
@@ -387,7 +378,6 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.rst_in                     (rst_in),
 		.rdy_in                     (rdy_in),
 
-		.if_icache_en_in            (if_icache_en),
 		.if_icache_inst_addr_in     (if_icache_inst_addr),
 		.icache_if_miss_out         (icache_if_miss),
 		.icache_if_inst_inst_out    (icache_if_inst_inst),
@@ -405,7 +395,6 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 
 		.icache_if_miss_in      (icache_if_miss),
 		.icache_if_inst_inst_in (icache_if_inst_inst),
-		.if_icache_en_out       (if_icache_en),
 		.if_icache_inst_addr_out(if_icache_inst_addr),
 
 		.if_instqueue_en_out    (if_instqueue_en),
@@ -417,7 +406,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.bp_if_pc_in            (bp_if_pc),
 
 		.decoder_if_en_in       (decoder_if_en),
-		.decoder_if_pc_in       (decoder_if_pc),
+		.decoder_if_addr_in       (decoder_if_addr),
 
 		.rob_if_en_in           (rob_if_en),
 		.rob_if_pc_in           (rob_if_pc)

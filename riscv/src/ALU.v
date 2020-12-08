@@ -15,13 +15,9 @@ module ALU(
 
 	//from & to reorder buffer
 	input wire rob_alu_rst_in,
-	output wire[`ROBWidth - 1 : 0] alu_rob_h_out,
-	output wire[`IDWidth - 1 : 0] alu_rob_result_out
+	output reg[`ROBWidth - 1 : 0] alu_rob_h_out,
+	output reg[`IDWidth - 1 : 0] alu_rob_result_out
 );
-
-	always @(posedge clk_in) begin
-		alu_rob_h_out <= `ROBWidth'b0;
-	end
 
 	always @(*) begin
 		if (rst_in) alu_rob_h_out = `ROBWidth'b0;
