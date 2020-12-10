@@ -43,9 +43,9 @@ module icache(
 		end else if (rdy_in) begin
 			if (state == BUSY && ramctrl_icache_inst_rdy_in) begin
 				state <= IDLE;
-				tag[(icache_ramctrl_addr_out >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= if_icache_inst_addr_in >> IndexWidth + ByteSelectWidth;
-				valid[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= 1'b1;
-				value[(if_icache_inst_addr_in >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= ramctrl_icache_inst_inst_in;
+				tag[(icache_ramctrl_addr_out >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= icache_ramctrl_addr_out >> IndexWidth + ByteSelectWidth;
+				valid[(icache_ramctrl_addr_out >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= 1'b1;
+				value[(icache_ramctrl_addr_out >> ByteSelectWidth) & (1 << IndexWidth) - 1] <= ramctrl_icache_inst_inst_in;
 				icache_ramctrl_en_out <= 1'b0;
 			end
 			if (miss && (state == IDLE || state == BUSY && ramctrl_icache_inst_rdy_in)) begin

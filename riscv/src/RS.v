@@ -86,9 +86,9 @@ module RS(
 //if it's a store instruction, push it
 
 	always @(posedge clk_in) begin
-		ready_to_addrunit <= `RSCount'b0;
-		ready_to_alu <= `RSCount'b0;
-		ready_to_rob <= `RSCount'b0;
+		ready_to_addrunit <= `RSWidth'b0;
+		ready_to_alu <= `RSWidth'b0;
+		ready_to_rob <= `RSWidth'b0;
 		if (rst_in) begin
 			for (i = 0;i < `RSCount;i = i + 1) busy[i] <= 1'b0;
 			rs_addrunit_opcode_out <= `NOP;
@@ -189,17 +189,23 @@ module RS(
 
 	always @(*) begin
 		if (rst_in) begin
-			idlelist_head = `RSWidth'b1;
-			head = `RSCount'b0;
-			tail = `RSCount'b0;
-			for (i = 0;i < `RSCount'b0;i = i + 1) idlelist_next[i] = `RSWidth'b0;
-			for (i = 1;i < `RSCount'b0;i = i + 1) in_LS_queue[i] = 1'b0;
+			idlelist_head = {`RSWidth{1'b1}};
+			head = `RSWidth'b0;
+			tail = `RSWidth'b0;
+			idlelist_next[0] = `RSWidth'b0;
+			for (i = 1;i < `RSCount;i = i + 1) begin
+				in_LS_queue[i] = 1'b0;
+				idlelist_next[i] = i - 1;
+			end
 		end else if (rdy_in) if (rob_rs_rst_in) begin
-			idlelist_head = `RSWidth'b1;
-			head = `RSCount'b0;
-			tail = `RSCount'b0;
-			for (i = 0;i < `RSCount'b0;i = i + 1) idlelist_next[i] = `RSWidth'b0;
-			for (i = 1;i < `RSCount'b0;i = i + 1) in_LS_queue[i] = 1'b0;
+			idlelist_head = {`RSWidth{1'b1}};
+			head = `RSWidth'b0;
+			tail = `RSWidth'b0;
+			idlelist_next[0] = `RSWidth'b0;
+			for (i = 1;i < `RSCount;i = i + 1) begin
+				in_LS_queue[i] = 1'b0;
+				idlelist_next[i] = i - 1;
+			end
 		end else begin
 			if (dispatcher_rs_en_in)
 				if (`SB <= dispatcher_rs_opcode_in && dispatcher_rs_opcode_in <= `SW) begin
@@ -234,5 +240,5 @@ module RS(
 		end
 	end
 
-	assign rs_instqueue_rdy_out = idlelist_head != `RSCount'b0;
+	assign rs_instqueue_rdy_out = idlelist_head != `RSWidth'b0;
 endmodule : RS

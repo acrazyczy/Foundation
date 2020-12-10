@@ -102,10 +102,14 @@ module lbuffer(
 	always @(*) begin
 		if (rst_in) begin
 			lbuffer_datactrl_en_out = 1'b0;
-			idlelist_head = `LBWidth'b0;
+			idlelist_head = {`LBWidth{1'b1}};
+			idlelist_next[0] = `LBWidth'b0;
+			for (i = 1;i < `LBCount;i = i + 1) idlelist_next[i] = i - 1;
 		end else if (rdy_in) if (rob_lbuffer_rst_in) begin
 			lbuffer_datactrl_en_out = 1'b0;
-			idlelist_head = `LBWidth'b0;
+			idlelist_head = {`LBWidth{1'b1}};
+			idlelist_next[0] = `LBWidth'b0;
+			for (i = 1;i < `LBCount;i = i + 1) idlelist_next[i] = i - 1;
 		end else begin
 			if (busy[idlelist_head]) idlelist_head = idlelist_next[idlelist_head];
 			if (stage == PENDING) begin
@@ -143,5 +147,5 @@ module lbuffer(
 		end
 	end
 
-	assign lbuffer_rs_rdy_out = idlelist_head != `LBCount'b0;
+	assign lbuffer_rs_rdy_out = idlelist_head != `LBWidth'b0;
 endmodule : lbuffer

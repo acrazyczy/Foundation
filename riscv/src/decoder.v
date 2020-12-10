@@ -31,6 +31,7 @@ module decoder(
 
 	always @(*) begin
 		decoder_instqueue_rst_out = 1'b0;
+		decoder_bp_en_out = 1'b0;
 		if (rst_in) begin
 			decoder_bp_en_out = 1'b0;
 			decoder_dispatcher_opcode_out = `NOP;
@@ -123,7 +124,8 @@ module decoder(
 					decoder_dispatcher_rd_out = instqueue_decoder_inst_in[11 : 7];
 					decoder_dispatcher_opcode_out = `JAL;
 					decoder_instqueue_rst_out = 1'b1;
-					decoder_if_addr_out = $signed({instqueue_decoder_inst_in[31], instqueue_decoder_inst_in[19 : 12], instqueue_decoder_inst_in[20], instqueue_decoder_inst_in[30 : 25], instqueue_decoder_inst_in[24 : 21], 1'b0}) + instqueue_decoder_pc_in;
+					decoder_dispatcher_imm_out = $signed({instqueue_decoder_inst_in[31], instqueue_decoder_inst_in[19 : 12], instqueue_decoder_inst_in[20], instqueue_decoder_inst_in[30 : 25], instqueue_decoder_inst_in[24 : 21], 1'b0});
+					decoder_if_addr_out = decoder_dispatcher_imm_out + instqueue_decoder_pc_in;
 				end
 				23: begin
 					decoder_dispatcher_rd_out = instqueue_decoder_inst_in[11 : 7];
