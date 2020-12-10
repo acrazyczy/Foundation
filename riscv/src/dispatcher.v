@@ -11,6 +11,7 @@ module dispatcher(
 	input wire[`IDWidth - 1 : 0] decoder_dispatcher_imm_in,
 	input wire[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode_in,
 	input wire[`AddressWidth - 1 : 0] decoder_dispatcher_pc_in,
+	input wire[`AddressWidth - 1 : 0] decoder_dispatcher_target_in,
 
 	//from branch predictor
 	input wire bp_dispatcher_taken_in,
@@ -50,6 +51,7 @@ module dispatcher(
 	output reg dispatcher_rob_en_out,
 	output wire[`InstTypeWidth - 1 : 0] dispatcher_rob_opcode_out,
 	output wire[`RegWidth - 1 : 0] dispatcher_rob_dest_out,
+	output wire[`AddressWidth - 1 : 0] dispatcher_rob_target_out,
 	output wire[`AddressWidth - 1 : 0] dispatcher_rob_pc_out,
 	output wire dispatcher_rob_taken_out
 );
@@ -86,6 +88,7 @@ module dispatcher(
 	assign dispatcher_rs_pc_out = decoder_dispatcher_pc_in;
 	assign dispatcher_rs_dest_out = rob_dispatcher_b_in;
 	assign dispatcher_rob_pc_out = decoder_dispatcher_pc_in;
+	assign dispatcher_rob_target_out = decoder_dispatcher_target_in;
 	assign dispatcher_rob_taken_out = bp_dispatcher_taken_in;
 	assign dispatcher_rs_a_out = decoder_dispatcher_imm_in;
 	assign dispatcher_regfile_rd_en_out = decoder_dispatcher_en_in && !(`BEQ <= decoder_dispatcher_opcode_in && decoder_dispatcher_opcode_in <= `BGEU) && !(`SB <= decoder_dispatcher_opcode_in && decoder_dispatcher_opcode_in <= `SW);

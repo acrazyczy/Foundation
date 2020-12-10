@@ -122,6 +122,7 @@ wire[`RegWidth - 1 : 0] decoder_dispatcher_rs, decoder_dispatcher_rt, decoder_di
 wire[`IDWidth - 1 : 0] decoder_dispatcher_imm;
 wire[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode;
 wire[`AddressWidth - 1 : 0] decoder_dispatcher_pc;
+wire[`AddressWidth - 1 : 0] decoder_dispatcher_target;
 
 // dispatcher <-> regfile
 wire[`RegWidth - 1 : 0] dispatcher_regfile_rs;
@@ -159,6 +160,7 @@ wire dispatcher_rob_en;
 wire[`InstTypeWidth - 1 : 0] dispatcher_rob_opcode;
 wire[`RegWidth - 1 : 0] dispatcher_rob_dest;
 wire[`AddressWidth - 1 : 0] dispatcher_rob_pc;
+wire[`AddressWidth - 1 : 0] dispatcher_rob_target;
 wire dispatcher_rob_taken;
 
 // icache <-> instruction fetch
@@ -319,7 +321,8 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.decoder_dispatcher_rd_out    (decoder_dispatcher_rd),
 		.decoder_dispatcher_imm_out   (decoder_dispatcher_imm),
 		.decoder_dispatcher_opcode_out(decoder_dispatcher_opcode),
-		.decoder_dispatcher_pc_out    (decoder_dispatcher_pc)
+		.decoder_dispatcher_pc_out    (decoder_dispatcher_pc),
+		.decoder_dispatcher_target_out(decoder_dispatcher_target)
 	);
 
 	dispatcher dispatcher(
@@ -334,6 +337,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.decoder_dispatcher_imm_in       (decoder_dispatcher_imm),
 		.decoder_dispatcher_opcode_in    (decoder_dispatcher_opcode),
 		.decoder_dispatcher_pc_in        (decoder_dispatcher_pc),
+		.decoder_dispatcher_target_in    (decoder_dispatcher_target),
 
 		.bp_dispatcher_taken_in          (bp_dispatcher_taken),
 
@@ -370,7 +374,8 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.dispatcher_rob_opcode_out       (dispatcher_rob_opcode),
 		.dispatcher_rob_dest_out         (dispatcher_rob_dest),
 		.dispatcher_rob_pc_out           (dispatcher_rob_pc),
-		.dispatcher_rob_taken_out        (dispatcher_rob_taken)
+		.dispatcher_rob_taken_out        (dispatcher_rob_taken),
+		.dispatcher_rob_target_out       (dispatcher_rob_target)
 	);
 
 	icache icache(
@@ -540,6 +545,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.dispatcher_rob_dest_in      (dispatcher_rob_dest),
 		.dispatcher_rob_pc_in        (dispatcher_rob_pc),
 		.dispatcher_rob_taken_in     (dispatcher_rob_taken),
+		.dispatcher_rob_target_in    (dispatcher_rob_target),
 
 		.rob_if_pc_out               (rob_if_pc),
 

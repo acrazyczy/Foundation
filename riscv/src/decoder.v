@@ -25,10 +25,12 @@ module decoder(
 	output reg[`RegWidth - 1 : 0] decoder_dispatcher_rs_out, decoder_dispatcher_rt_out, decoder_dispatcher_rd_out,
 	output reg[`IDWidth - 1 : 0] decoder_dispatcher_imm_out,
 	output reg[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode_out,
+	output reg[`AddressWidth - 1 : 0] decoder_dispatcher_target_out,
 	output reg[`AddressWidth - 1 : 0] decoder_dispatcher_pc_out
 );
 
 	always @(*) begin
+		decoder_instqueue_rst_out = 1'b0;
 		if (rst_in) begin
 			decoder_bp_en_out = 1'b0;
 			decoder_dispatcher_opcode_out = `NOP;
@@ -113,6 +115,7 @@ module decoder(
 						3'b111: decoder_dispatcher_opcode_out = `BGEU;
 					endcase
 					decoder_bp_target_out = instqueue_decoder_pc_in + decoder_dispatcher_imm_out;
+					decoder_dispatcher_target_out = instqueue_decoder_pc_in + decoder_dispatcher_imm_out;
 					decoder_bp_en_out = 1'b1;
 					decoder_bp_pc_out = instqueue_decoder_pc_in;
 				end

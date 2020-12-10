@@ -30,6 +30,7 @@ module ROB(
 	input wire dispatcher_rob_en_in,
 	input wire[`InstTypeWidth - 1 : 0] dispatcher_rob_opcode_in,
 	input wire[`RegWidth - 1 : 0] dispatcher_rob_dest_in,
+	input wire[`AddressWidth - 1 : 0] dispatcher_rob_target_in,
 	input wire[`AddressWidth - 1 : 0] dispatcher_rob_pc_in,
 	input wire dispatcher_rob_taken_in,
 
@@ -72,6 +73,7 @@ module ROB(
 	reg[`AddressWidth - 1 : 0] pc[`ROBCount - 1 : 0];
 	reg[`IDWidth - 1 : 0] value[`ROBCount - 1 : 0];
 	reg[`AddressWidth - 1 : 0] address[`ROBCount - 1 : 0];
+	reg[`AddressWidth - 1 : 0] target[`ROBCount - 1 : 0];
 	reg bp_taken[`ROBCount - 1 : 0];
 	reg ready[`ROBCount - 1 : 0];
 	reg activated[`ROBCount - 1 : 0];
@@ -116,6 +118,7 @@ module ROB(
 				dest[tail] <= dispatcher_rob_dest_in;
 				pc[tail] <= dispatcher_rob_pc_in;
 				bp_taken[tail] <= dispatcher_rob_taken_in;
+				target[tail] <= dispatcher_rob_target_in;
 				activated[tail] <= 1'b0;
 				ready[tail] <= 1'b0;
 				tail <= tail % (`ROBCount - 1) + 1;
@@ -131,7 +134,7 @@ module ROB(
 				if (`BEQ <= opcode[head] && opcode[head] <= `BGEU) begin
 					rob_bp_en_out <= 1'b1;
 					if (bp_taken[head] != value[head]) begin
-						if (value[head]) rob_if_pc_out <= $signed({opcode[head][31], opcode[head][7], opcode[head][30 : 25], opcode[head][11 : 8], 1'b0}) + pc[head];
+						if (value[head]) rob_if_pc_out <= target[head];
 						else rob_if_pc_out <= pc[head] + 4;
 						rob_rst_out <= 1'b1;
 					end else rob_bp_correct_out <= 1'b1;
