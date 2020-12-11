@@ -62,11 +62,12 @@ module datactrl(
 					state = RDATA;
 				end
 			end else if (ramctrl_datactrl_data_rdy_in) begin
-				if (state == WDATA) datactrl_rob_en_out = 1'b1;
-				else begin
+				if (state == WDATA) begin datactrl_rob_en_out = 1'b1;
+				end else begin
 					datactrl_lbuffer_en_out = 1'b1;
 					datactrl_lbuffer_data_out = ramctrl_datactrl_data_data_in;
 				end
+				datactrl_ramctrl_data_en_out = 1'b0;
 				state = IDLE;
 			end
 		end

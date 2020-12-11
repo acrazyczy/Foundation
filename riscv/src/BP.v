@@ -40,8 +40,8 @@ module BP(
 					bp_dispatcher_taken_out = 1'b1;
 					bp_instqueue_rst_out = 1'b1;
 				end else begin
-					bp_if_pc_out = decoder_bp_pc_in + 4;
 					bp_dispatcher_taken_out = 1'b0;
+					bp_if_pc_out = decoder_bp_target_in;
 					bp_instqueue_rst_out = 1'b0;
 				end
 			end

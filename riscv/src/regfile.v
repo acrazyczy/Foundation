@@ -16,7 +16,7 @@ module regfile(
 	output wire[`ROBWidth - 1 : 0] regfile_dispatcher_rt_reorder_out,
 	input wire dispatcher_regfile_rd_en_in,
 	input wire[`RegWidth - 1 : 0] dispatcher_regfile_rd_in,
-	input wire dispatcher_regfile_reorder_in,
+	input wire[`ROBWidth - 1 : 0] dispatcher_regfile_reorder_in,
 
 	//from reorder buffer
 	input wire rob_regfile_en_in,

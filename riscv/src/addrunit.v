@@ -12,29 +12,27 @@ module addrunit(
 	input wire[`IDWidth - 1 : 0] rs_addrunit_opcode_in,
 
 	//to lbuffer
-	output reg addrunit_lbuffer_en_out,
+	output wire addrunit_lbuffer_en_out,
 	output reg[`AddressWidth - 1 : 0] addrunit_lbuffer_a_out,
 	output reg[`ROBWidth - 1 : 0] addrunit_lbuffer_dest_out,
 	output reg[`IDWidth - 1 : 0] addrunit_lbuffer_opcode_out,
 
 	//from & to reorder buffer
 	input wire rob_addrunit_rst_in,
-	output reg[`ROBWidth - 1 : 0] addrunit_rob_h_out,
+	output wire[`ROBWidth - 1 : 0] addrunit_rob_h_out,
 	output reg[`AddressWidth - 1 : 0] addrunit_rob_address_out
 );
 	always @(*) begin
-		if (rst_in) begin
-			addrunit_lbuffer_en_out = 1'b0;
-		end else if (rdy_in) if (rs_addrunit_opcode_in == `NOP) addrunit_lbuffer_en_out = 1'b0;
-		else begin
+		if (!rst_in && rdy_in && rs_addrunit_opcode_in != `NOP) begin
 			if (`LB <= rs_addrunit_opcode_in && rs_addrunit_opcode_in <= `LHU) begin
-				addrunit_lbuffer_en_out = 1'b1;
 				addrunit_lbuffer_dest_out = rs_addrunit_dest_in;
 				addrunit_lbuffer_a_out = rs_addrunit_vj_in + rs_addrunit_a_in;
 				addrunit_lbuffer_opcode_out = rs_addrunit_opcode_in;
 			end
-			addrunit_rob_h_out = rs_addrunit_dest_in;
 			addrunit_rob_address_out = rs_addrunit_vj_in + rs_addrunit_a_in;
 		end
 	end
+
+	assign addrunit_lbuffer_en_out = rs_addrunit_opcode_in != `NOP;
+	assign addrunit_rob_h_out = rs_addrunit_opcode_in != `NOP ? rs_addrunit_dest_in : `ROBWidth'b0;
 endmodule : addrunit

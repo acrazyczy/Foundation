@@ -89,14 +89,12 @@ module RS(
 		ready_to_addrunit <= `RSWidth'b0;
 		ready_to_alu <= `RSWidth'b0;
 		ready_to_rob <= `RSWidth'b0;
+		rs_alu_opcode_out <= `NOP;
+		rs_addrunit_opcode_out <= `NOP;
 		if (rst_in) begin
 			for (i = 0;i < `RSCount;i = i + 1) busy[i] <= 1'b0;
-			rs_addrunit_opcode_out <= `NOP;
-			rs_alu_opcode_out <= `NOP;
 		end else if (rdy_in) if (rob_rs_rst_in) begin
 			for (i = 0;i < `RSCount;i = i + 1) busy[i] <= 1'b0;
-			rs_addrunit_opcode_out <= `NOP;
-			rs_alu_opcode_out <= `NOP;
 		end else begin
 			if (dispatcher_rs_en_in) begin
 				busy[idlelist_head] <= 1'b1;
@@ -207,7 +205,7 @@ module RS(
 				idlelist_next[i] = i - 1;
 			end
 		end else begin
-			if (dispatcher_rs_en_in)
+			if (dispatcher_rs_en_in && busy[idlelist_head])
 				if (`SB <= dispatcher_rs_opcode_in && dispatcher_rs_opcode_in <= `SW) begin
 					LS_queue[tail] = idlelist_head;
 					in_LS_queue[idlelist_head] = 1'b1;
@@ -222,7 +220,8 @@ module RS(
 				if (`LB <= opcode[ready_to_addrunit] && opcode[ready_to_addrunit] <= `LHU) begin
 					idlelist_next[ready_to_addrunit] = idlelist_head;
 					idlelist_head = ready_to_addrunit;
-				end else begin
+				end else if (head != tail && LS_queue[head] == ready_to_addrunit) begin
+					in_LS_queue[LS_queue[head]] = 1'b0;
 					head = (head + 1) % `RSCount;
 					while (head != tail && `LB <= opcode[LS_queue[head]] && opcode[LS_queue[head]] <= `LHU) begin
 						in_LS_queue[LS_queue[head]] = 1'b0;

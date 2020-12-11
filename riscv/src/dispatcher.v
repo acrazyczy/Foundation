@@ -27,7 +27,7 @@ module dispatcher(
 	input wire[`ROBWidth - 1 : 0] regfile_dispatcher_rt_reorder_in,
 	output wire dispatcher_regfile_rd_en_out,
 	output wire[`RegWidth - 1 : 0] dispatcher_regfile_rd_out,
-	output wire dispatcher_regfile_reorder_out,
+	output wire[`ROBWidth - 1 : 0] dispatcher_regfile_reorder_out,
 
 	//from & to reservation station
 	output wire dispatcher_rs_en_out,
@@ -48,7 +48,7 @@ module dispatcher(
 	input wire rob_dispatcher_rt_ready_in,
 	input wire[`IDWidth - 1 : 0] rob_dispatcher_rt_value_in,
 	input wire[`ROBWidth - 1 : 0] rob_dispatcher_b_in,
-	output reg dispatcher_rob_en_out,
+	output wire dispatcher_rob_en_out,
 	output wire[`InstTypeWidth - 1 : 0] dispatcher_rob_opcode_out,
 	output wire[`RegWidth - 1 : 0] dispatcher_rob_dest_out,
 	output wire[`AddressWidth - 1 : 0] dispatcher_rob_target_out,
@@ -84,6 +84,7 @@ module dispatcher(
 		end
 	end
 
+	assign dispatcher_rob_en_out = decoder_dispatcher_en_in;
 	assign dispatcher_rs_en_out = decoder_dispatcher_en_in;
 	assign dispatcher_rs_pc_out = decoder_dispatcher_pc_in;
 	assign dispatcher_rs_dest_out = rob_dispatcher_b_in;

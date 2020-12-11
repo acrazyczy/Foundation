@@ -135,7 +135,7 @@ wire[`IDWidth - 1 : 0] regfile_dispatcher_rt;
 wire[`ROBWidth - 1 : 0] regfile_dispatcher_rt_reorder;
 wire dispatcher_regfile_rd_en;
 wire[`RegWidth - 1 : 0] dispatcher_regfile_rd;
-wire dispatcher_regfile_reorder;
+wire[`AddressWidth - 1 : 0] dispatcher_regfile_reorder;
 
 // dispatcher <-> reservation station
 wire dispatcher_rs_en;
@@ -345,13 +345,13 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.regfile_dispatcher_rs_busy_in   (regfile_dispatcher_rs_busy),
 		.regfile_dispatcher_rs_in        (regfile_dispatcher_rs),
 		.regfile_dispatcher_rs_reorder_in(regfile_dispatcher_rs_reorder),
-		.dispatcher_regfile_rt_out       (dispatcher_regfile_rt_out),
+		.dispatcher_regfile_rt_out       (dispatcher_regfile_rt),
 		.regfile_dispatcher_rt_busy_in   (regfile_dispatcher_rt_busy),
 		.regfile_dispatcher_rt_in        (regfile_dispatcher_rt),
 		.regfile_dispatcher_rt_reorder_in(regfile_dispatcher_rt_reorder),
-		.dispatcher_regfile_rd_en_out    (dispatcher_regfile_rd_en_out),
-		.dispatcher_regfile_rd_out       (dispatcher_regfile_rd_out),
-		.dispatcher_regfile_reorder_out  (dispatcher_regfile_reorder_out),
+		.dispatcher_regfile_rd_en_out    (dispatcher_regfile_rd_en),
+		.dispatcher_regfile_rd_out       (dispatcher_regfile_rd),
+		.dispatcher_regfile_reorder_out  (dispatcher_regfile_reorder),
 
 		.dispatcher_rs_en_out            (dispatcher_rs_en),
 		.dispatcher_rs_a_out             (dispatcher_rs_a),

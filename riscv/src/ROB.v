@@ -102,6 +102,7 @@ module ROB(
 
 	always @(posedge clk_in) begin
 		rob_rst_out <= 1'b0;
+		rob_regfile_en_out <= 1'b0;
 		if (rst_in) begin
 			head <= `ROBWidth'b1;
 			tail <= `ROBWidth'b1;
@@ -141,7 +142,7 @@ module ROB(
 					rob_bp_pc_out <= pc[head];
 					busy[head] <= 1'b0;
 					head <= head % (`ROBCount - 1) + 1;
-				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= BUSY;
+				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= PENDING;
 				else begin
 					rob_regfile_en_out <= 1'b1;
 					rob_regfile_d_out <= dest[head];
@@ -172,8 +173,8 @@ module ROB(
 
 	always @(*) begin
 		if (rst_in) begin
-			rob_datactrl_en_out = 1'b0;
 			for (i = 1;i < `ROBCount;i = i + 1) activated[i] = 1'b0;
+			rob_datactrl_en_out = 1'b0;
 		end else if (rdy_in) begin
 			if (stage == PENDING) begin
 				rob_datactrl_en_out = 1'b1;
@@ -184,10 +185,12 @@ module ROB(
 					`SH: rob_datactrl_width_out = 3'b010;
 					`SW: rob_datactrl_width_out = 3'b100;
 				endcase
-			end else if (stage == BUSY && datactrl_rob_en_in)
+			end else if (stage == BUSY && datactrl_rob_en_in) begin
+				rob_datactrl_en_out = 1'b0;
 				for (i = 1;i < `ROBCount;i = i + 1)
 					if (busy[i] && activated[i] && address[i] == address[head])
 						occupation[i] = occupation[i] - 1;
+			end
 			if (lbuffer_rob_en_in) begin
 				activated[lbuffer_rob_rob_index_in] = 1'b1;
 				occupation[lbuffer_rob_rob_index_in] = `ROBWidth'b0;
