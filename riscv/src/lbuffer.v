@@ -40,6 +40,7 @@ module lbuffer(
 	reg[`InstTypeWidth - 1 : 0] opcode[`LBCount - 1 : 0];
 	reg[`LBWidth - 1 : 0] idlelist_head;
 	reg[`LBWidth - 1 : 0] idlelist_next[`LBCount - 1 : 0];
+	reg in_idlelist[`LBCount - 1 : 0];
 	reg[1 : 0] stage;
 	reg[`LBWidth - 1 : 0] current_load_id, next_load_id;
 	integer i;
@@ -104,14 +105,23 @@ module lbuffer(
 			lbuffer_datactrl_en_out = 1'b0;
 			idlelist_head = {`LBWidth{1'b1}};
 			idlelist_next[0] = `LBWidth'b0;
-			for (i = 1;i < `LBCount;i = i + 1) idlelist_next[i] = i - 1;
+			for (i = 1;i < `LBCount;i = i + 1) begin
+				idlelist_next[i] = i - 1;
+				in_idlelist[i] = 1'b1;
+			end
 		end else if (rdy_in) if (rob_lbuffer_rst_in) begin
 			lbuffer_datactrl_en_out = 1'b0;
 			idlelist_head = {`LBWidth{1'b1}};
 			idlelist_next[0] = `LBWidth'b0;
-			for (i = 1;i < `LBCount;i = i + 1) idlelist_next[i] = i - 1;
+			for (i = 1;i < `LBCount;i = i + 1) begin
+				idlelist_next[i] = i - 1;
+				in_idlelist[i] = 1'b1;
+			end
 		end else begin
-			if (busy[idlelist_head]) idlelist_head = idlelist_next[idlelist_head];
+			if (busy[idlelist_head]) begin
+				in_idlelist[idlelist_head] = 1'b0;
+				idlelist_head = idlelist_next[idlelist_head];
+			end
 			if (stage == PENDING) begin
 					lbuffer_datactrl_en_out = 1'b1;
 					lbuffer_datactrl_addr_out = a[current_load_id];
@@ -141,8 +151,11 @@ module lbuffer(
 				lbuffer_rob_h_out = dest[current_load_id];
 				lbuffer_rob_result_out = datactrl_lbuffer_data_in;
 				lbuffer_datactrl_en_out = 1'b0;
-				idlelist_next[current_load_id] = idlelist_head;
-				idlelist_head = current_load_id;
+				if (!in_idlelist[current_load_id]) begin
+					idlelist_next[current_load_id] = idlelist_head;
+					idlelist_head = current_load_id;
+					in_idlelist[current_load_id] = 1'b1;
+				end
 			end
 		end
 	end

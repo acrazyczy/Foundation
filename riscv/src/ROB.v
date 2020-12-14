@@ -13,6 +13,7 @@ module ROB(
 	//from & to ALU
 	input wire[`ROBWidth - 1 : 0] alu_rob_h_in,
 	input wire[`IDWidth - 1 : 0] alu_rob_result_in,
+	input wire[`AddressWidth - 1 : 0] alu_rob_addr_in,
 
 	//to branch prediction
 	output reg rob_bp_en_out,
@@ -107,7 +108,7 @@ module ROB(
 			head <= `ROBWidth'b1;
 			tail <= `ROBWidth'b1;
 			deactivated_rob <= `LBWidth'b0;
-			for (i = 1;i < `ROBCount;i = i + 1) begin
+			for (i = 0;i < `ROBCount;i = i + 1) begin
 				busy[i] <= 1'b0;
 				index[i] <= `LBWidth'b0;
 			end
@@ -144,6 +145,10 @@ module ROB(
 					head <= head % (`ROBCount - 1) + 1;
 				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= PENDING;
 				else begin
+					if (opcode[head] == `JALR) begin
+						rob_if_pc_out <= target[head];
+						rob_rst_out <= 1'b1;
+					end
 					rob_regfile_en_out <= 1'b1;
 					rob_regfile_d_out <= dest[head];
 					rob_regfile_value_out <= value[head];
@@ -154,6 +159,7 @@ module ROB(
 			if (alu_rob_h_in != `ROBWidth'b0) begin
 				value[alu_rob_h_in] <= alu_rob_result_in;
 				ready[alu_rob_h_in] <= 1'b1;
+				if (opcode[alu_rob_h_in] == `JALR) target[alu_rob_h_in] <= alu_rob_addr_in;
 			end
 			if (addrunit_rob_h_in != `ROBWidth'b0) address[addrunit_rob_h_in] <= alu_rob_result_in;
 			if (lbuffer_rob_h_in != `ROBWidth'b0) begin
@@ -164,10 +170,10 @@ module ROB(
 				value[rs_rob_h_in] <= rs_rob_result_in;
 				ready[rs_rob_h_in] <= 1'b1;
 			end
-			deactivated_rob <= `LBWidth'b0;
+			deactivated_rob <= `ROBWidth'b0;
 			for (i = 1;i < `ROBCount;i = i + 1)
 				if (busy[i] && activated[i] && occupation[i] == `ROBWidth'b0)
-					deactivated_rob <= index[i];
+					deactivated_rob <= i;
 		end
 	end
 

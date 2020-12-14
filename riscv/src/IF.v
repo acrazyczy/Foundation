@@ -30,35 +30,42 @@ module IF(
 );
 
 	reg[`AddressWidth - 1 : 0] pc, pc_temp;
-	reg state;
+	reg[1 : 0] state;
 
-	localparam IDLE = 1'b0;
-	localparam PENDING = 1'b1;
+	localparam IDLE = 2'b00;
+	localparam PENDING = 2'b01;
+	localparam LOCKED = 2'b10;
 
 	always @(posedge clk_in) begin
 		if (rst_in) begin
 			pc <= `AddressWidth'b0;
 			if_instqueue_en_out <= 1'b0;
 			if_icache_inst_addr_out <= `AddressWidth'b0;
-			state <=  IDLE;
+			state <= IDLE;
 		end else if (rdy_in) begin
-			if (rob_if_en_in) begin
+			if (rob_if_en_in && state != LOCKED) begin
 				pc <= rob_if_pc_in;
 				if_instqueue_en_out <= 1'b0;
 				if_icache_inst_addr_out <= rob_if_pc_in;
 				state <= IDLE;
-			end else if (decoder_if_en_in) begin
+			end else if (decoder_if_en_in && state != LOCKED) begin
 				if (state == IDLE) begin
 					pc <= decoder_if_addr_in;
 					if_instqueue_en_out <= 1'b0;
 					if_icache_inst_addr_out <= decoder_if_addr_in;
-				end else pc_temp <= decoder_if_addr_in;
-			end else if (bp_if_en_in) begin
+				end else if (state == PENDING) begin
+					pc_temp <= decoder_if_addr_in;
+					state <= LOCKED;
+				end
+			end else if (bp_if_en_in && state != LOCKED) begin
 				if (state == IDLE) begin
 					pc <= bp_if_pc_in;
 					if_instqueue_en_out <= 1'b0;
 					if_icache_inst_addr_out <= bp_if_pc_in;
-				end else pc_temp <= bp_if_pc_in;
+				end else if (state == PENDING) begin
+					pc_temp <= bp_if_pc_in;
+					state <= LOCKED;
+				end
 			end else if (!icache_if_miss_in) begin
 				if (instqueue_if_rdy_in) begin
 					if_instqueue_en_out <= 1'b1;

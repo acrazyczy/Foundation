@@ -37,12 +37,12 @@ module regfile(
 				busy[i] <= 1'b0;
 				reorder[i] <= `ROBWidth'b0;
 			end
-		end else if (rdy_in) if (rob_regfile_rst_in) begin
-			for (i = 0;i < `RegCount;i = i + 1) begin
-				busy[i] <= 1'b0;
-				reorder[i] <= `ROBWidth'b0;
-			end
-		end else begin
+		end else if (rdy_in) begin
+			if (rob_regfile_rst_in)
+				for (i = 0;i < `RegCount;i = i + 1) begin
+					busy[i] <= 1'b0;
+					reorder[i] <= `ROBWidth'b0;
+				end
 			if (rob_regfile_en_in && rob_regfile_d_in != `RegWidth'b0) begin
 				register[rob_regfile_d_in] <= rob_regfile_value_in;
 				if (reorder[rob_regfile_d_in] == rob_regfile_h_in) begin

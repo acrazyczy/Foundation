@@ -67,7 +67,8 @@ module RS(
 	reg[`RSWidth - 1 : 0] LS_queue[`RSCount - 1 : 0];
 	reg[`RSWidth - 1 : 0] head, tail;
 	reg[`RSWidth - 1 : 0] idlelist_head;
-	reg[`RSWidth - 1 : 0] idlelist_next[`LBCount - 1 : 0];
+	reg[`RSWidth - 1 : 0] idlelist_next[`RSCount - 1 : 0];
+	reg in_idlelist[`RSCount - 1 : 0];
 	integer i;
 
 //at posedge
@@ -194,6 +195,7 @@ module RS(
 			for (i = 1;i < `RSCount;i = i + 1) begin
 				in_LS_queue[i] = 1'b0;
 				idlelist_next[i] = i - 1;
+				in_idlelist[i] = 1'b1;
 			end
 		end else if (rdy_in) if (rob_rs_rst_in) begin
 			idlelist_head = {`RSWidth{1'b1}};
@@ -203,6 +205,7 @@ module RS(
 			for (i = 1;i < `RSCount;i = i + 1) begin
 				in_LS_queue[i] = 1'b0;
 				idlelist_next[i] = i - 1;
+				in_idlelist[i] = 1'b1;
 			end
 		end else begin
 			if (dispatcher_rs_en_in && busy[idlelist_head])
@@ -215,12 +218,16 @@ module RS(
 					in_LS_queue[idlelist_head] = 1'b1;
 					tail = (tail + 1) % `RSCount;
 				end
-			if (busy[idlelist_head]) idlelist_head = idlelist_next[idlelist_head];
+			if (busy[idlelist_head]) begin
+				in_idlelist[idlelist_head] = 1'b0;
+				idlelist_head = idlelist_next[idlelist_head];
+			end
 			if (ready_to_addrunit != `RSCount'b0)
-				if (`LB <= opcode[ready_to_addrunit] && opcode[ready_to_addrunit] <= `LHU) begin
+				if (`LB <= opcode[ready_to_addrunit] && opcode[ready_to_addrunit] <= `LHU && !in_idlelist[ready_to_addrunit]) begin
 					idlelist_next[ready_to_addrunit] = idlelist_head;
 					idlelist_head = ready_to_addrunit;
-				end else if (head != tail && LS_queue[head] == ready_to_addrunit) begin
+					in_idlelist[ready_to_addrunit] = 1'b1;
+				end else if (`SB <= opcode[ready_to_addrunit] && opcode[ready_to_addrunit] <= `SW && head != tail && LS_queue[head] == ready_to_addrunit) begin
 					in_LS_queue[LS_queue[head]] = 1'b0;
 					head = (head + 1) % `RSCount;
 					while (head != tail && `LB <= opcode[LS_queue[head]] && opcode[LS_queue[head]] <= `LHU) begin
@@ -228,13 +235,15 @@ module RS(
 						head = (head + 1) % `RSCount;
 					end
 				end
-			if (ready_to_alu != `RSCount'b0) begin
+			if (ready_to_alu != `RSCount'b0 && !in_idlelist[ready_to_alu]) begin
 				idlelist_next[ready_to_alu] = idlelist_head;
 				idlelist_head = ready_to_alu;
+				in_idlelist[ready_to_alu] = 1'b1;
 			end
-			if (ready_to_rob != `RSCount'b0) begin
+			if (ready_to_rob != `RSCount'b0 && !in_idlelist[ready_to_rob]) begin
 				idlelist_next[ready_to_rob] = idlelist_head;
 				idlelist_head = ready_to_rob;
+				in_idlelist[ready_to_rob] = 1'b1;
 			end
 		end
 	end

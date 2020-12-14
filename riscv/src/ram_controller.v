@@ -34,7 +34,8 @@ module ram_controller(
 	localparam S1 = 3'b010;
 	localparam S2 = 3'b011;
 	localparam S3 = 3'b100;
-	localparam OK = 3'b101;
+	localparam OK1 = 3'b101;
+	localparam OK2 = 3'b110;
 
 	localparam NONE = 2'b00;
 	localparam RINST = 2'b01;
@@ -71,7 +72,7 @@ module ram_controller(
 							data[23 : 16] <= ram_in;
 							inst_rdy_out <= 1'b0;
 						end
-						OK: begin
+						OK1: begin
 							inst_inst_out <= {ram_in, data[23 : 0]};
 							inst_rdy_out <= 1'b1;
 						end
@@ -108,7 +109,7 @@ module ram_controller(
 							data[23 : 16] <= ram_in;
 							data_rdy_out <= 1'b0;
 						end
-						OK: begin
+						OK1: begin
 							data_data_out <= {ram_in, data[23 : 0]};
 							data_rdy_out <= 1'b1;
 						end
@@ -121,7 +122,7 @@ module ram_controller(
 						S0: data_rdy_out <= 1'b0;
 						S1: if (data_width_in == 3'b001) data_rdy_out <= 1'b1;
 						S2: if (data_width_in == 3'b010) data_rdy_out <= 1'b1;
-						OK: data_rdy_out <= 1'b1;
+						OK1: data_rdy_out <= 1'b1;
 						default: data_rdy_out <= 1'b0;
 					endcase
 				end
@@ -155,8 +156,9 @@ module ram_controller(
 					current_stage <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_in == 3'b010 ? IDLE : S3;
 					current_rw_state <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_in == 3'b010 ? NONE : current_rw_state;
 				end
-				S3: current_stage <= OK;
-				OK: begin
+				S3: current_stage <= OK1;
+				OK1: current_stage <= OK2;
+				OK2: begin
 					current_stage <= IDLE;
 					current_rw_state <= NONE;
 				end

@@ -37,13 +37,13 @@ wire rob_rst;
 wire[`IDWidth - 1 : 0] rs_addrunit_a;
 wire[`IDWidth - 1 : 0] rs_addrunit_vj;
 wire[`ROBWidth - 1 : 0] rs_addrunit_dest;
-wire[`IDWidth - 1 : 0] rs_addrunit_opcode;
+wire[`InstTypeWidth - 1 : 0] rs_addrunit_opcode;
 
 // load buffer <-> address unit
 wire addrunit_lbuffer_en;
 wire[`AddressWidth - 1 : 0] addrunit_lbuffer_a;
 wire[`ROBWidth - 1 : 0] addrunit_lbuffer_dest;
-wire[`IDWidth - 1 : 0] addrunit_lbuffer_opcode;
+wire[`InstTypeWidth - 1 : 0] addrunit_lbuffer_opcode;
 
 // reorder buffer <-> address unit
 wire[`ROBWidth - 1 : 0] addrunit_rob_h;
@@ -60,6 +60,7 @@ wire[`InstTypeWidth - 1 : 0] rs_alu_opcode;
 // ALU <-> reorder buffer
 wire[`ROBWidth - 1 : 0] alu_rob_h;
 wire[`IDWidth - 1 : 0] alu_rob_result;
+wire[`AddressWidth - 1 : 0] alu_rob_addr;
 
 // branch predictor <-> decoder
 wire decoder_bp_en;
@@ -135,7 +136,7 @@ wire[`IDWidth - 1 : 0] regfile_dispatcher_rt;
 wire[`ROBWidth - 1 : 0] regfile_dispatcher_rt_reorder;
 wire dispatcher_regfile_rd_en;
 wire[`RegWidth - 1 : 0] dispatcher_regfile_rd;
-wire[`AddressWidth - 1 : 0] dispatcher_regfile_reorder;
+wire[`ROBWidth - 1 : 0] dispatcher_regfile_reorder;
 
 // dispatcher <-> reservation station
 wire dispatcher_rs_en;
@@ -181,7 +182,6 @@ wire[`AddressWidth - 1 : 0] if_instqueue_pc;
 wire instqueue_if_rdy;
 
 // instruction fetch <-> reorder buffer
-wire rob_if_en;
 wire[`AddressWidth - 1 : 0] rob_if_pc;
 
 // instruction queue <-> reservation station
@@ -206,7 +206,6 @@ wire rob_regfile_en;
 wire[`RegWidth - 1 : 0] rob_regfile_d;
 wire[`IDWidth - 1 : 0] rob_regfile_value;
 wire[`ROBWidth - 1 : 0] rob_regfile_h;
-wire rob_regfile_rst;
 
 //reorder buffer <-> reservation station
 wire[`ROBWidth - 1 : 0] rs_rob_h;
@@ -246,6 +245,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 
 		.rob_alu_rst_in    (rob_rst),
 		.alu_rob_h_out     (alu_rob_h),
+		.alu_rob_addr_out  (alu_rob_addr),
 		.alu_rob_result_out(alu_rob_result)
 	);
 
@@ -322,7 +322,9 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.decoder_dispatcher_imm_out   (decoder_dispatcher_imm),
 		.decoder_dispatcher_opcode_out(decoder_dispatcher_opcode),
 		.decoder_dispatcher_pc_out    (decoder_dispatcher_pc),
-		.decoder_dispatcher_target_out(decoder_dispatcher_target)
+		.decoder_dispatcher_target_out(decoder_dispatcher_target),
+
+		.rob_decoder_rst_in           (rob_rst)
 	);
 
 	dispatcher dispatcher(
@@ -450,7 +452,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.addrunit_lbuffer_dest_in     (addrunit_lbuffer_dest),
 		.addrunit_lbuffer_opcode_in   (addrunit_lbuffer_opcode),
 
-		.rob_lbuffer_rst_in           (rob__rst),
+		.rob_lbuffer_rst_in           (rob_rst),
 		.lbuffer_rob_h_out            (lbuffer_rob_h),
 		.lbuffer_rob_result_out       (lbuffer_rob_result),
 		.lbuffer_rob_en_out           (lbuffer_rob_en),
@@ -527,6 +529,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.addrunit_rob_address_in     (addrunit_rob_address),
 
 		.alu_rob_h_in                (alu_rob_h),
+		.alu_rob_addr_in             (alu_rob_addr),
 		.alu_rob_result_in           (alu_rob_result),
 
 		.rob_bp_en_out               (rob_bp_en),

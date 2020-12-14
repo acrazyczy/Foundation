@@ -16,7 +16,8 @@ module ALU(
 	//from & to reorder buffer
 	input wire rob_alu_rst_in,
 	output reg[`ROBWidth - 1 : 0] alu_rob_h_out,
-	output reg[`IDWidth - 1 : 0] alu_rob_result_out
+	output reg[`IDWidth - 1 : 0] alu_rob_result_out,
+	output reg[`AddressWidth : 0] alu_rob_addr_out
 );
 
 	always @(*) begin
@@ -35,7 +36,10 @@ module ALU(
 					`LUI: alu_rob_result_out = rs_alu_a_in;
 					`AUIPC: alu_rob_result_out = rs_alu_pc_in + rs_alu_a_in;
 					`JAL: alu_rob_result_out = rs_alu_pc_in + 4;
-					`JALR: alu_rob_result_out = rs_alu_pc_in + 4;
+					`JALR: begin
+						alu_rob_result_out = rs_alu_pc_in + 4;
+						alu_rob_addr_out = rs_alu_a_in + rs_alu_vj_in;
+					end
 					`ADDI: alu_rob_result_out = rs_alu_vj_in + rs_alu_a_in;
 					`SLTI: alu_rob_result_out = $unsigned($signed(rs_alu_vj_in) < $signed(rs_alu_a_in));
 					`SLTIU: alu_rob_result_out = $unsigned(rs_alu_vj_in < rs_alu_a_in);
@@ -55,6 +59,7 @@ module ALU(
 					`SRA: alu_rob_result_out = $signed(rs_alu_vj_in) >> rs_alu_vk_in;
 					`OR: alu_rob_result_out = rs_alu_vj_in | rs_alu_vk_in;
 					`AND: alu_rob_result_out = rs_alu_vj_in & rs_alu_vk_in;
+					default: alu_rob_result_out = `IDWidth'b0;
 				endcase
 			end
 	end

@@ -26,13 +26,16 @@ module decoder(
 	output reg[`IDWidth - 1 : 0] decoder_dispatcher_imm_out,
 	output reg[`InstTypeWidth - 1 : 0] decoder_dispatcher_opcode_out,
 	output reg[`AddressWidth - 1 : 0] decoder_dispatcher_target_out,
-	output reg[`AddressWidth - 1 : 0] decoder_dispatcher_pc_out
+	output reg[`AddressWidth - 1 : 0] decoder_dispatcher_pc_out,
+
+	//from reorder buffer
+	input wire rob_decoder_rst_in
 );
 
 	always @(*) begin
 		decoder_instqueue_rst_out = 1'b0;
 		decoder_bp_en_out = 1'b0;
-		if (rst_in) begin
+		if (rst_in || rob_decoder_rst_in) begin
 			decoder_bp_en_out = 1'b0;
 			decoder_dispatcher_opcode_out = `NOP;
 		end else if (rdy_in && instqueue_decoder_en_in) begin
@@ -141,7 +144,7 @@ module decoder(
 		end
 	end
 
-	assign decoder_if_en_out = !rst_in && instqueue_decoder_en_in && ((instqueue_decoder_inst_in & `IDWidth'd127) == 111);
+	assign decoder_if_en_out = !rst_in && !rob_decoder_rst_in && instqueue_decoder_en_in && ((instqueue_decoder_inst_in & `IDWidth'd127) == 111);
 	assign decoder_dispatcher_en_out = instqueue_decoder_en_in;
 
 endmodule : decoder
