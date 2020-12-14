@@ -125,37 +125,6 @@ module ROB(
 				ready[tail] <= 1'b0;
 				tail <= tail % (`ROBCount - 1) + 1;
 			end
-			if (stage == PENDING) stage <= BUSY;
-			else if (stage == BUSY) begin
-				if (datactrl_rob_en_in) begin
-					stage = IDLE;
-					busy[head] <= 1'b0;
-					head = head % (`ROBCount - 1) + 1;
-				end
-			end else if (head != tail && ready[head] == 1'b1)
-				if (`BEQ <= opcode[head] && opcode[head] <= `BGEU) begin
-					rob_bp_en_out <= 1'b1;
-					if (bp_taken[head] != value[head]) begin
-						if (value[head]) rob_if_pc_out <= target[head];
-						else rob_if_pc_out <= pc[head] + 4;
-						rob_rst_out <= 1'b1;
-					end else rob_bp_correct_out <= 1'b1;
-					rob_bp_pc_out <= pc[head];
-					busy[head] <= 1'b0;
-					head <= head % (`ROBCount - 1) + 1;
-				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= PENDING;
-				else begin
-					if (opcode[head] == `JALR) begin
-						rob_if_pc_out <= target[head];
-						rob_rst_out <= 1'b1;
-					end
-					rob_regfile_en_out <= 1'b1;
-					rob_regfile_d_out <= dest[head];
-					rob_regfile_value_out <= value[head];
-					rob_regfile_h_out <= head;
-					busy[head] <= 1'b0;
-					head <= head % (`ROBCount - 1) + 1;
-				end
 			if (alu_rob_h_in != `ROBWidth'b0) begin
 				value[alu_rob_h_in] <= alu_rob_result_in;
 				ready[alu_rob_h_in] <= 1'b1;
@@ -174,6 +143,55 @@ module ROB(
 			for (i = 1;i < `ROBCount;i = i + 1)
 				if (busy[i] && activated[i] && occupation[i] == `ROBWidth'b0)
 					deactivated_rob <= i;
+			if (stage == PENDING) stage <= BUSY;
+			else if (stage == BUSY) begin
+				if (datactrl_rob_en_in) begin
+					stage = IDLE;
+					busy[head] <= 1'b0;
+					head = head % (`ROBCount - 1) + 1;
+				end
+			end else if (head != tail && ready[head] == 1'b1)
+				if (`BEQ <= opcode[head] && opcode[head] <= `BGEU) begin
+					rob_bp_en_out <= 1'b1;
+					rob_bp_pc_out <= pc[head];
+					if (bp_taken[head] != value[head]) begin
+						if (value[head]) rob_if_pc_out <= target[head];
+						else rob_if_pc_out <= pc[head] + 4;
+						rob_rst_out <= 1'b1;
+						head <= `ROBWidth'b1;
+						tail <= `ROBWidth'b1;
+						deactivated_rob <= `LBWidth'b0;
+						for (i = 0;i < `ROBCount;i = i + 1) begin
+							busy[i] <= 1'b0;
+							index[i] <= `LBWidth'b0;
+						end
+						stage <= IDLE;
+					end else begin
+						rob_bp_correct_out <= 1'b1;
+						busy[head] <= 1'b0;
+						head <= head % (`ROBCount - 1) + 1;
+					end
+				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= PENDING;
+				else begin
+					rob_regfile_en_out <= 1'b1;
+					rob_regfile_d_out <= dest[head];
+					rob_regfile_value_out <= value[head];
+					rob_regfile_h_out <= head;
+					busy[head] <= 1'b0;
+					head <= head % (`ROBCount - 1) + 1;
+					if (opcode[head] == `JALR) begin
+						rob_if_pc_out <= target[head];
+						rob_rst_out <= 1'b1;
+						head <= `ROBWidth'b1;
+						tail <= `ROBWidth'b1;
+						deactivated_rob <= `LBWidth'b0;
+						for (i = 0;i < `ROBCount;i = i + 1) begin
+							busy[i] <= 1'b0;
+							index[i] <= `LBWidth'b0;
+						end
+						stage <= IDLE;
+					end
+				end
 		end
 	end
 

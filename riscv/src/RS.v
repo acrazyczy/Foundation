@@ -97,6 +97,9 @@ module RS(
 		end else if (rdy_in) if (rob_rs_rst_in) begin
 			for (i = 0;i < `RSCount;i = i + 1) busy[i] <= 1'b0;
 		end else begin
+			if (ready_to_alu != `RSWidth'b0) busy[ready_to_alu] <= 1'b0;
+			if (ready_to_addrunit != `RSWidth'b0 && (opcode[ready_to_addrunit] < `SB || opcode[ready_to_addrunit] > `SW)) busy[ready_to_addrunit] <= 1'b0;
+			if (ready_to_rob != `RSWidth'b0) busy[ready_to_rob] <= 1'b0;
 			if (dispatcher_rs_en_in) begin
 				busy[idlelist_head] <= 1'b1;
 				a[idlelist_head] <= dispatcher_rs_a_in;
@@ -137,14 +140,12 @@ module RS(
 							rs_addrunit_vj_out <= vj[i];
 							rs_addrunit_dest_out <= dest[i];
 							rs_addrunit_opcode_out <= opcode[i];
-							busy[i] <= 1'b0;
 						end
 					end else if (`SB <= opcode[i] && opcode[i] <= `SW) begin
 						if (qk[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
 							ready_to_rob <= i;
 							rs_rob_h_out <= dest[i];
 							rs_rob_result_out <= vk[i];
-							busy[i] <= 1'b0;
 						end else if (qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
 							ready_to_addrunit <= i;
 							rs_addrunit_a_out <= a[i];
@@ -161,7 +162,6 @@ module RS(
 							rs_alu_dest_out <= dest[i];
 							rs_alu_pc_out <= pc[i];
 							rs_alu_opcode_out <= opcode[i];
-							busy[i] <= 1'b0;
 						end
 					end else if (opcode[i] == `JALR || `ADDI <= opcode[i] && opcode[i] <= `SRAI) begin
 						if (qj[i] == `ROBWidth'b0) begin
@@ -171,7 +171,6 @@ module RS(
 							rs_alu_dest_out <= dest[i];
 							rs_alu_pc_out <= pc[i];
 							rs_alu_opcode_out <= opcode[i];
-							busy[i] <= 1'b0;
 						end
 					end else if (`LUI <= opcode[i] && opcode[i] <= `JAL) begin
 						ready_to_alu <= i;
@@ -180,7 +179,6 @@ module RS(
 						rs_alu_dest_out <= dest[i];
 						rs_alu_pc_out <= pc[i];
 						rs_alu_opcode_out <= opcode[i];
-						busy[i] <= 1'b0;
 					end
 				end
 		end

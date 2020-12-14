@@ -67,9 +67,6 @@ wire decoder_bp_en;
 wire[`AddressWidth - 1 : 0] decoder_bp_pc;
 wire[`AddressWidth - 1 : 0] decoder_bp_target;
 
-// branch predictor <-> instruction queue
-wire bp_instqueue_rst;
-
 // branch predictor <-> instruction fetch
 wire bp_if_en;
 wire[`AddressWidth - 1 : 0] bp_if_pc;
@@ -258,8 +255,6 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.decoder_bp_pc_in       (decoder_bp_pc),
 		.decoder_bp_target_in   (decoder_bp_target),
 
-		.bp_instqueue_rst_out   (bp_instqueue_rst),
-
 		.bp_if_en_out           (bp_if_en),
 		.bp_if_pc_out           (bp_if_pc),
 
@@ -439,7 +434,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.instqueue_decoder_inst_out(instqueue_decoder_inst),
 		.instqueue_decoder_pc_out  (instqueue_decoder_pc),
 
-		.bp_instqueue_rst_in       (bp_instqueue_rst)
+		.bp_instqueue_rst_in       (bp_if_en)
 	);
 
 	lbuffer lbuffer(
