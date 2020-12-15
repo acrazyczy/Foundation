@@ -68,11 +68,10 @@ wire[`AddressWidth - 1 : 0] decoder_bp_pc;
 wire[`AddressWidth - 1 : 0] decoder_bp_target;
 
 // branch predictor <-> instruction fetch
-wire bp_if_en;
 wire[`AddressWidth - 1 : 0] bp_if_pc;
 
-// branch predictor <-> dispatcher
-wire bp_dispatcher_taken;
+// branch predictor
+wire bp_taken;
 
 // branch predictor <-> reorder buffer
 wire rob_bp_en;
@@ -247,22 +246,21 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 	);
 
 	BP BP(
-		.clk_in                 (clk_in),
-		.rst_in                 (rst_in),
-		.rdy_in                 (rdy_in),
+		.clk_in              (clk_in),
+		.rst_in              (rst_in),
+		.rdy_in              (rdy_in),
 
-		.decoder_bp_en_in       (decoder_bp_en),
-		.decoder_bp_pc_in       (decoder_bp_pc),
-		.decoder_bp_target_in   (decoder_bp_target),
+		.bp_taken_out        (bp_taken),
 
-		.bp_if_en_out           (bp_if_en),
-		.bp_if_pc_out           (bp_if_pc),
+		.decoder_bp_en_in    (decoder_bp_en),
+		.decoder_bp_pc_in    (decoder_bp_pc),
+		.decoder_bp_target_in(decoder_bp_target),
 
-		.bp_dispatcher_taken_out(bp_dispatcher_taken),
+		.bp_if_pc_out        (bp_if_pc),
 
-		.rob_bp_en_in           (rob_bp_en),
-		.rob_bp_correct_in      (rob_bp_correct),
-		.rob_bp_pc_in           (rob_bp_pc)
+		.rob_bp_en_in        (rob_bp_en),
+		.rob_bp_correct_in   (rob_bp_correct),
+		.rob_bp_pc_in        (rob_bp_pc)
 	);
 
 	datactrl datactrl(
@@ -336,7 +334,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.decoder_dispatcher_pc_in        (decoder_dispatcher_pc),
 		.decoder_dispatcher_target_in    (decoder_dispatcher_target),
 
-		.bp_dispatcher_taken_in          (bp_dispatcher_taken),
+		.bp_dispatcher_taken_in          (bp_taken),
 
 		.dispatcher_regfile_rs_out       (dispatcher_regfile_rs),
 		.regfile_dispatcher_rs_busy_in   (regfile_dispatcher_rs_busy),
@@ -404,11 +402,11 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.if_instqueue_pc_out    (if_instqueue_pc),
 		.instqueue_if_rdy_in    (instqueue_if_rdy),
 
-		.bp_if_en_in            (bp_if_en),
+		.bp_if_en_in            (bp_taken),
 		.bp_if_pc_in            (bp_if_pc),
 
 		.decoder_if_en_in       (decoder_if_en),
-		.decoder_if_addr_in       (decoder_if_addr),
+		.decoder_if_addr_in     (decoder_if_addr),
 
 		.rob_if_en_in           (rob_rst),
 		.rob_if_pc_in           (rob_if_pc)
@@ -434,7 +432,7 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.instqueue_decoder_inst_out(instqueue_decoder_inst),
 		.instqueue_decoder_pc_out  (instqueue_decoder_pc),
 
-		.bp_instqueue_rst_in       (bp_if_en)
+		.bp_instqueue_rst_in       (bp_taken)
 	);
 
 	lbuffer lbuffer(

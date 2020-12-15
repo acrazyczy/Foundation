@@ -104,6 +104,7 @@ module ROB(
 	always @(posedge clk_in) begin
 		rob_rst_out <= 1'b0;
 		rob_regfile_en_out <= 1'b0;
+		rob_bp_en_out <= 1'b0;
 		if (rst_in) begin
 			head <= `ROBWidth'b1;
 			tail <= `ROBWidth'b1;
@@ -130,7 +131,7 @@ module ROB(
 				ready[alu_rob_h_in] <= 1'b1;
 				if (opcode[alu_rob_h_in] == `JALR) target[alu_rob_h_in] <= alu_rob_addr_in;
 			end
-			if (addrunit_rob_h_in != `ROBWidth'b0) address[addrunit_rob_h_in] <= alu_rob_result_in;
+			if (addrunit_rob_h_in != `ROBWidth'b0) address[addrunit_rob_h_in] <= addrunit_rob_address_in;
 			if (lbuffer_rob_h_in != `ROBWidth'b0) begin
 				value[lbuffer_rob_h_in] <= lbuffer_rob_result_in;
 				ready[lbuffer_rob_h_in] <= 1'b1;

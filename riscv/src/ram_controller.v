@@ -142,8 +142,8 @@ module ram_controller(
 						current_rw_state <= NONE;
 					end else begin
 						current_stage <= S0;
-						if (data_en_in && data_rw_in) current_rw_state <= RDATA;
-						else if (data_en_in && !data_rw_in) current_rw_state <= WDATA;
+						if (data_en_in && !data_rw_in) current_rw_state <= RDATA;
+						else if (data_en_in && data_rw_in) current_rw_state <= WDATA;
 						else current_rw_state <= RINST;
 					end
 				end

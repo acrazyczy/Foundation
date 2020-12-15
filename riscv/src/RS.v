@@ -134,7 +134,7 @@ module RS(
 						end
 					end
 					if (`LB <= opcode[i] && opcode[i] <= `LHU) begin
-						if (lbuffer_rs_rdy_in && qj[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
+						if (i != ready_to_addrunit && lbuffer_rs_rdy_in && qj[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
 							ready_to_addrunit <= i;
 							rs_addrunit_a_out <= a[i];
 							rs_addrunit_vj_out <= vj[i];
@@ -142,11 +142,11 @@ module RS(
 							rs_addrunit_opcode_out <= opcode[i];
 						end
 					end else if (`SB <= opcode[i] && opcode[i] <= `SW) begin
-						if (qk[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
+						if (i != ready_to_rob && qk[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
 							ready_to_rob <= i;
 							rs_rob_h_out <= dest[i];
 							rs_rob_result_out <= vk[i];
-						end else if (qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
+						end else if (i != ready_to_addrunit && qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
 							ready_to_addrunit <= i;
 							rs_addrunit_a_out <= a[i];
 							rs_addrunit_vj_out <= vj[i];
@@ -154,7 +154,7 @@ module RS(
 							rs_addrunit_opcode_out <= opcode[i];
 						end
 					end else if (`BEQ <= opcode[i] && opcode[i] <= `BGEU || `ADD <= opcode[i] && opcode[i] <= `AND) begin
-						if (qj[i] == `ROBWidth'b0 && qk[i] == `ROBWidth'b0) begin
+						if (i != ready_to_alu && qj[i] == `ROBWidth'b0 && qk[i] == `ROBWidth'b0) begin
 							ready_to_alu <= i;
 							rs_alu_a_out <= a[i];
 							rs_alu_vj_out <= vj[i];
@@ -164,7 +164,7 @@ module RS(
 							rs_alu_opcode_out <= opcode[i];
 						end
 					end else if (opcode[i] == `JALR || `ADDI <= opcode[i] && opcode[i] <= `SRAI) begin
-						if (qj[i] == `ROBWidth'b0) begin
+						if (i != ready_to_alu && qj[i] == `ROBWidth'b0) begin
 							ready_to_alu <= i;
 							rs_alu_a_out <= a[i];
 							rs_alu_vj_out <= vj[i];
@@ -172,7 +172,7 @@ module RS(
 							rs_alu_pc_out <= pc[i];
 							rs_alu_opcode_out <= opcode[i];
 						end
-					end else if (`LUI <= opcode[i] && opcode[i] <= `JAL) begin
+					end else if (i != ready_to_alu && `LUI <= opcode[i] && opcode[i] <= `JAL) begin
 						ready_to_alu <= i;
 						rs_alu_a_out <= a[i];
 						rs_alu_vj_out <= vj[i];
