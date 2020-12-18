@@ -4,9 +4,9 @@ module RS(
 	input wire clk_in,
 	input wire rst_in,
 	input wire rdy_in,
+	input wire stall_in,
 
-	//to instruction queue
-	output wire rs_instqueue_rdy_out,
+	output wire rs_rdy_out,
 
 	//from dispatcher
 	input wire dispatcher_rs_en_in,
@@ -93,14 +93,29 @@ module RS(
 		rs_alu_opcode_out <= `NOP;
 		rs_addrunit_opcode_out <= `NOP;
 		if (rst_in) begin
-			for (i = 0;i < `RSCount;i = i + 1) busy[i] <= 1'b0;
+			for (i = 0;i < `RSCount;i = i + 1) begin
+				busy[i] <= 1'b0;
+				pc[i] <= `AddressWidth'b0;
+			end
 		end else if (rdy_in) if (rob_rs_rst_in) begin
-			for (i = 0;i < `RSCount;i = i + 1) busy[i] <= 1'b0;
+			for (i = 0;i < `RSCount;i = i + 1) begin
+				busy[i] <= 1'b0;
+				pc[i] <= `AddressWidth'b0;
+			end
 		end else begin
-			if (ready_to_alu != `RSWidth'b0) busy[ready_to_alu] <= 1'b0;
-			if (ready_to_addrunit != `RSWidth'b0 && (opcode[ready_to_addrunit] < `SB || opcode[ready_to_addrunit] > `SW)) busy[ready_to_addrunit] <= 1'b0;
-			if (ready_to_rob != `RSWidth'b0) busy[ready_to_rob] <= 1'b0;
-			if (dispatcher_rs_en_in) begin
+			if (ready_to_alu != `RSWidth'b0) begin
+				busy[ready_to_alu] <= 1'b0;
+				pc[ready_to_alu] <= `AddressWidth'b0;
+			end
+			if (ready_to_addrunit != `RSWidth'b0 && (opcode[ready_to_addrunit] < `SB || opcode[ready_to_addrunit] > `SW)) begin
+				busy[ready_to_addrunit] <= 1'b0;
+				pc[ready_to_addrunit] <= `AddressWidth'b0;
+			end
+			if (ready_to_rob != `RSWidth'b0) begin
+				busy[ready_to_rob] <= 1'b0;
+				pc[ready_to_rob] <= `AddressWidth'b0;
+			end
+			if (dispatcher_rs_en_in && !stall_in) begin
 				busy[idlelist_head] <= 1'b1;
 				a[idlelist_head] <= dispatcher_rs_a_in;
 				qj[idlelist_head] <= dispatcher_rs_qj_in;
@@ -246,5 +261,5 @@ module RS(
 		end
 	end
 
-	assign rs_instqueue_rdy_out = idlelist_head != `RSWidth'b0;
+	assign rs_rdy_out = idlelist_head != `RSWidth'b0;
 endmodule : RS

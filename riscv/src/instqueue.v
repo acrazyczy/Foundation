@@ -4,6 +4,7 @@ module instqueue(
 	input wire clk_in,
 	input wire rst_in,
 	input wire rdy_in,
+	input wire stall_in,
 
 	//from & to instruction fetch
 	input wire if_instqueue_en_in,
@@ -11,12 +12,8 @@ module instqueue(
 	input wire [`AddressWidth - 1 : 0] if_instqueue_pc_in,
 	output wire instqueue_if_rdy_out,
 
-	//from reservation station
-	input wire rs_instqueue_rdy_in,
-
 	//from reorder buffer
 	input wire rob_instqueue_rst_in,
-	input wire rob_instqueue_rdy_in,
 
 	//from & to decoder
 	input wire decoder_instqueue_rst_in,
@@ -54,12 +51,12 @@ module instqueue(
 				end
 				instqueue_decoder_en_out <= 1'b0;
 			end else begin
-				if (if_instqueue_en_in) begin
+				if (if_instqueue_en_in && instqueue_if_rdy_out) begin
 					inst[tail] <= if_instqueue_inst_in;
 					pc[tail] <= if_instqueue_pc_in;
 					tail <= (tail + 1) % QueueCount;
 				end
-				if (rob_instqueue_rdy_in && rs_instqueue_rdy_in && head != tail) begin
+				if (!stall_in && head != tail) begin
 					instqueue_decoder_en_out <= 1'b1;
 					instqueue_decoder_inst_out <= inst[head];
 					instqueue_decoder_pc_out <= pc[head];

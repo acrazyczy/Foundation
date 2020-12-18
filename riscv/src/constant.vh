@@ -8,7 +8,6 @@
 `define RegWidth 5
 `define InstTypeWidth 6
 `define ROBCount 32
-/*ROB 0 left empty intentionally*/
 `define ROBWidth 5
 `define RSCount 32
 `define RSWidth 5

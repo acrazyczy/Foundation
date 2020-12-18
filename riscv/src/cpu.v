@@ -180,12 +180,6 @@ wire instqueue_if_rdy;
 // instruction fetch <-> reorder buffer
 wire[`AddressWidth - 1 : 0] rob_if_pc;
 
-// instruction queue <-> reservation station
-wire rs_instqueue_rdy;
-
-// instruction queue <-> reorder buffer
-wire rob_instqueue_rdy;
-
 // load buffer <-> reorder buffer
 wire[`ROBWidth - 1 : 0] lbuffer_rob_h;
 wire[`IDWidth - 1 : 0] lbuffer_rob_result;
@@ -206,6 +200,10 @@ wire[`ROBWidth - 1 : 0] rob_regfile_h;
 //reorder buffer <-> reservation station
 wire[`ROBWidth - 1 : 0] rs_rob_h;
 wire[`IDWidth - 1 : 0] rs_rob_result;
+
+wire rs_rdy, rob_rdy;
+
+wire stall = !rs_rdy || !rob_rdy;
 
 	addrunit addrunit(
 		.clk_in                     (clk_in),
@@ -416,16 +414,14 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.clk_in                    (clk_in),
 		.rst_in                    (rst_in),
 		.rdy_in                    (rdy_in),
+		.stall_in                  (stall),
 
 		.if_instqueue_en_in        (if_instqueue_en),
 		.if_instqueue_inst_in      (if_instqueue_inst),
 		.if_instqueue_pc_in        (if_instqueue_pc),
 		.instqueue_if_rdy_out      (instqueue_if_rdy),
 
-		.rs_instqueue_rdy_in       (rs_instqueue_rdy),
-
 		.rob_instqueue_rst_in      (rob_rst),
-		.rob_instqueue_rdy_in      (rob_instqueue_rdy),
 
 		.decoder_instqueue_rst_in  (decoder_instqueue_rst),
 		.instqueue_decoder_en_out  (instqueue_decoder_en),
@@ -517,6 +513,9 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.rst_in                      (rst_in),
 		.rdy_in                      (rdy_in),
 		.rob_rst_out                 (rob_rst),
+		.stall_in                    (stall),
+
+		.rob_rdy_out                 (rob_rdy),
 
 		.addrunit_rob_h_in           (addrunit_rob_h),
 		.addrunit_rob_address_in     (addrunit_rob_address),
@@ -545,8 +544,6 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 
 		.rob_if_pc_out               (rob_if_pc),
 
-		.rob_instqueue_rdy_out       (rob_instqueue_rdy),
-
 		.lbuffer_rob_h_in            (lbuffer_rob_h),
 		.lbuffer_rob_result_in       (lbuffer_rob_result),
 		.lbuffer_rob_en_in           (lbuffer_rob_en),
@@ -573,8 +570,9 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 		.clk_in                 (clk_in),
 		.rst_in                 (rst_in),
 		.rdy_in                 (rdy_in),
+		.stall_in               (stall),
 
-		.rs_instqueue_rdy_out   (rs_instqueue_rdy),
+		.rs_rdy_out             (rs_rdy),
 
 		.dispatcher_rs_en_in    (dispatcher_rs_en),
 		.dispatcher_rs_a_in     (dispatcher_rs_a),

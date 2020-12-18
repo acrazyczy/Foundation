@@ -4,7 +4,10 @@ module ROB(
 	input wire clk_in,
 	input wire rst_in,
 	input wire rdy_in,
+	input wire stall_in,
 	output reg rob_rst_out,
+
+	output wire rob_rdy_out,
 
 	//from & to address unit
 	input wire[`ROBWidth - 1 : 0] addrunit_rob_h_in,
@@ -37,9 +40,6 @@ module ROB(
 
 	//to instruction fetch
 	output reg[`AddressWidth - 1 : 0] rob_if_pc_out,
-
-	//to instruction queue
-	output wire rob_instqueue_rdy_out,
 
 	//from & to load buffer
 	input wire[`ROBWidth - 1 : 0] lbuffer_rob_h_in,
@@ -111,11 +111,12 @@ module ROB(
 			deactivated_rob <= `LBWidth'b0;
 			for (i = 0;i < `ROBCount;i = i + 1) begin
 				busy[i] <= 1'b0;
+				pc[i] <= `AddressWidth'b0;
 				index[i] <= `LBWidth'b0;
 			end
 			stage <= IDLE;
 		end else if (rdy_in) begin
-			if (dispatcher_rob_en_in) begin
+			if (dispatcher_rob_en_in && !stall_in) begin
 				busy[tail] <= 1'b1;
 				opcode[tail] <= dispatcher_rob_opcode_in;
 				dest[tail] <= dispatcher_rob_dest_in;
@@ -147,8 +148,9 @@ module ROB(
 			if (stage == PENDING) stage <= BUSY;
 			else if (stage == BUSY) begin
 				if (datactrl_rob_en_in) begin
-					stage = IDLE;
+					stage <= IDLE;
 					busy[head] <= 1'b0;
+					pc[head] <= `AddressWidth'b0;
 					head = head % (`ROBCount - 1) + 1;
 				end
 			end else if (head != tail && ready[head] == 1'b1)
@@ -164,12 +166,14 @@ module ROB(
 						deactivated_rob <= `LBWidth'b0;
 						for (i = 0;i < `ROBCount;i = i + 1) begin
 							busy[i] <= 1'b0;
+							pc[i] <= `AddressWidth'b0;
 							index[i] <= `LBWidth'b0;
 						end
 						stage <= IDLE;
 					end else begin
 						rob_bp_correct_out <= 1'b1;
 						busy[head] <= 1'b0;
+						pc[head] <= `AddressWidth'b0;
 						head <= head % (`ROBCount - 1) + 1;
 					end
 				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= PENDING;
@@ -179,6 +183,7 @@ module ROB(
 					rob_regfile_value_out <= value[head];
 					rob_regfile_h_out <= head;
 					busy[head] <= 1'b0;
+					pc[head] <= `AddressWidth'b0;
 					head <= head % (`ROBCount - 1) + 1;
 					if (opcode[head] == `JALR) begin
 						rob_if_pc_out <= target[head];
@@ -213,7 +218,7 @@ module ROB(
 			end else if (stage == BUSY && datactrl_rob_en_in) begin
 				rob_datactrl_en_out = 1'b0;
 				for (i = 1;i < `ROBCount;i = i + 1)
-					if (busy[i] && activated[i] && address[i] == address[head])
+					if (busy[i] && activated[i] && address[i] == address[(head + `ROBCount - 2) % `ROBCount + 1])
 						occupation[i] = occupation[i] - 1;
 			end
 			if (lbuffer_rob_en_in) begin
@@ -230,7 +235,7 @@ module ROB(
 		end
 	end
 
-	assign rob_instqueue_rdy_out = head != tail % (`ROBCount - 1) + 1;
+	assign rob_rdy_out = head != tail % (`ROBCount - 1) + 1;
 	assign rob_dispatcher_rs_ready_out = ready[dispatcher_rob_rs_h_in];
 	assign rob_dispatcher_rs_value_out = value[dispatcher_rob_rs_h_in];
 	assign rob_dispatcher_rt_ready_out = ready[dispatcher_rob_rt_h_in];
