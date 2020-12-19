@@ -111,9 +111,8 @@ module ram_controller(
 						end
 						OK1: begin
 							data_data_out <= {ram_in, data[23 : 0]};
-							data_rdy_out <= 1'b0;
+							data_rdy_out <= 1'b1;
 						end
-						OK2: data_rdy_out <= 1'b1;
 						default: data_rdy_out <= 1'b0;
 					endcase
 				end

@@ -183,10 +183,10 @@ wire[`AddressWidth - 1 : 0] rob_if_pc;
 // load buffer <-> reorder buffer
 wire[`ROBWidth - 1 : 0] lbuffer_rob_h;
 wire[`IDWidth - 1 : 0] lbuffer_rob_result;
-wire lbuffer_rob_en;
-wire[`ROBWidth - 1 : 0] lbuffer_rob_rob_index;
-wire[`LBWidth - 1 : 0] lbuffer_rob_lbuffer_index;
-wire[`LBWidth - 1 : 0] rob_lbuffer_index;
+wire[`ROBWidth - 1 : 0] lbuffer_rob_index;
+wire rob_lbuffer_disambiguation;
+wire rob_lbuffer_forwarding_en;
+wire[`IDWidth - 1 : 0] rob_lbuffer_forwarding_data;
 
 // load buffer <-> reservation station
 wire lbuffer_rs_rdy;
@@ -197,7 +197,7 @@ wire[`RegWidth - 1 : 0] rob_regfile_d;
 wire[`IDWidth - 1 : 0] rob_regfile_value;
 wire[`ROBWidth - 1 : 0] rob_regfile_h;
 
-//reorder buffer <-> reservation station
+// reorder buffer <-> reservation station
 wire[`ROBWidth - 1 : 0] rs_rob_h;
 wire[`IDWidth - 1 : 0] rs_rob_result;
 
@@ -265,6 +265,7 @@ wire stall = !rs_rdy || !rob_rdy;
 		.clk_in                         (clk_in),
 		.rst_in                         (rst_in),
 		.rdy_in                         (rdy_in),
+		.rob_rst_in                     (rob_rst),
 
 		.rob_datactrl_en_in             (rob_datactrl_en),
 		.rob_datactrl_width_in          (rob_datactrl_width),
@@ -444,10 +445,10 @@ wire stall = !rs_rdy || !rob_rdy;
 		.rob_lbuffer_rst_in           (rob_rst),
 		.lbuffer_rob_h_out            (lbuffer_rob_h),
 		.lbuffer_rob_result_out       (lbuffer_rob_result),
-		.lbuffer_rob_en_out           (lbuffer_rob_en),
-		.lbuffer_rob_rob_index_out    (lbuffer_rob_rob_index),
-		.lbuffer_rob_lbuffer_index_out(lbuffer_rob_lbuffer_index),
-		.rob_lbuffer_index_in         (rob_lbuffer_index),
+		.lbuffer_rob_index_out         (lbuffer_rob_index),
+		.rob_lbuffer_disambiguation_in (rob_lbuffer_disambiguation),
+		.rob_lbuffer_forwarding_en_in  (rob_lbuffer_forwarding_en),
+		.rob_lbuffer_forwarding_data_in(rob_lbuffer_forwarding_data),
 
 		.lbuffer_rs_rdy_out           (lbuffer_rs_rdy),
 
@@ -546,10 +547,10 @@ wire stall = !rs_rdy || !rob_rdy;
 
 		.lbuffer_rob_h_in            (lbuffer_rob_h),
 		.lbuffer_rob_result_in       (lbuffer_rob_result),
-		.lbuffer_rob_en_in           (lbuffer_rob_en),
-		.lbuffer_rob_rob_index_in    (lbuffer_rob_rob_index),
-		.lbuffer_rob_lbuffer_index_in(lbuffer_rob_lbuffer_index),
-		.rob_lbuffer_index_out       (rob_lbuffer_index),
+		.lbuffer_rob_index_in           (lbuffer_rob_index),
+		.rob_lbuffer_disambiguation_out (rob_lbuffer_disambiguation),
+		.rob_lbuffer_forwarding_en_out  (rob_lbuffer_forwarding_en),
+		.rob_lbuffer_forwarding_data_out(rob_lbuffer_forwarding_data),
 
 		.rob_regfile_en_out          (rob_regfile_en),
 		.rob_regfile_d_out           (rob_regfile_d),

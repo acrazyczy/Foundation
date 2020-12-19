@@ -90,6 +90,7 @@ module RS(
 		ready_to_addrunit <= `RSWidth'b0;
 		ready_to_alu <= `RSWidth'b0;
 		ready_to_rob <= `RSWidth'b0;
+		rs_rob_h_out <= `ROBWidth'b0;
 		rs_alu_opcode_out <= `NOP;
 		rs_addrunit_opcode_out <= `NOP;
 		if (rst_in) begin
@@ -115,7 +116,7 @@ module RS(
 				busy[ready_to_rob] <= 1'b0;
 				pc[ready_to_rob] <= `AddressWidth'b0;
 			end
-			if (dispatcher_rs_en_in && !stall_in) begin
+			if (dispatcher_rs_en_in) begin
 				busy[idlelist_head] <= 1'b1;
 				a[idlelist_head] <= dispatcher_rs_a_in;
 				qj[idlelist_head] <= dispatcher_rs_qj_in;
@@ -160,7 +161,11 @@ module RS(
 						if (i != ready_to_rob && qk[i] == `ROBWidth'b0 && !in_LS_queue[i]) begin
 							ready_to_rob <= i;
 							rs_rob_h_out <= dest[i];
-							rs_rob_result_out <= vk[i];
+							case (opcode[i])
+								`SB: rs_rob_result_out <= vk[i][7 : 0];
+								`SH: rs_rob_result_out <= vk[i][15 : 0];
+								`SW: rs_rob_result_out <= vk[i];
+							endcase
 						end else if (i != ready_to_addrunit && qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
 							ready_to_addrunit <= i;
 							rs_addrunit_a_out <= a[i];
@@ -261,5 +266,5 @@ module RS(
 		end
 	end
 
-	assign rs_rdy_out = idlelist_head != `RSWidth'b0;
+	assign rs_rdy_out = (idlelist_head != `RSWidth'b0) && (idlelist_next[idlelist_head] != `RSWidth'b0);
 endmodule : RS
