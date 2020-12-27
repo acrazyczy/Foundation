@@ -213,10 +213,10 @@ module ROB(
 	end
 
 	assign rob_rdy_out = (head != tail % (`ROBCount - 1) + 1) && (head != tail % (`ROBCount - 1) + 2);
-	assign rob_dispatcher_rs_ready_out = ready[dispatcher_rob_rs_h_in];
-	assign rob_dispatcher_rs_value_out = value[dispatcher_rob_rs_h_in];
-	assign rob_dispatcher_rt_ready_out = ready[dispatcher_rob_rt_h_in];
-	assign rob_dispatcher_rt_value_out = value[dispatcher_rob_rt_h_in];
+	assign rob_dispatcher_rs_ready_out = ready[dispatcher_rob_rs_h_in] || alu_rob_h_in == dispatcher_rob_rs_h_in || lbuffer_rob_h_in == dispatcher_rob_rs_h_in;
+	assign rob_dispatcher_rs_value_out = alu_rob_h_in == dispatcher_rob_rs_h_in ? alu_rob_result_in : (lbuffer_rob_h_in == dispatcher_rob_rs_h_in ? lbuffer_rob_result_in : value[dispatcher_rob_rs_h_in]);
+	assign rob_dispatcher_rt_ready_out = ready[dispatcher_rob_rt_h_in] || alu_rob_h_in == dispatcher_rob_rt_h_in || lbuffer_rob_h_in == dispatcher_rob_rt_h_in;
+	assign rob_dispatcher_rt_value_out = alu_rob_h_in == dispatcher_rob_rt_h_in ? alu_rob_result_in : (lbuffer_rob_h_in == dispatcher_rob_rt_h_in ? lbuffer_rob_result_in : value[dispatcher_rob_rt_h_in]);
 	assign rob_dispatcher_b_out = tail;
 
 endmodule : ROB

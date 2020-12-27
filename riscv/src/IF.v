@@ -29,56 +29,34 @@ module IF(
 	input wire[`AddressWidth - 1 : 0] rob_if_pc_in
 );
 
-	reg[`AddressWidth - 1 : 0] pc, pc_temp;
-	reg[1 : 0] state;
-
-	localparam IDLE = 2'b00;
-	localparam PENDING = 2'b01;
-	localparam LOCKED = 2'b10;
+	reg[`AddressWidth - 1 : 0] pc;
 
 	always @(posedge clk_in) begin
 		if (rst_in) begin
 			pc <= `AddressWidth'b0;
 			if_instqueue_en_out <= 1'b0;
 			if_icache_inst_addr_out <= `AddressWidth'b0;
-			state <= IDLE;
 		end else if (rdy_in) begin
-			if (rob_if_en_in && state != LOCKED) begin
+			if (rob_if_en_in) begin
 				pc <= rob_if_pc_in;
 				if_instqueue_en_out <= 1'b0;
 				if_icache_inst_addr_out <= rob_if_pc_in;
-				state <= IDLE;
-			end else if (decoder_if_en_in && state != LOCKED) begin
-				if (state == IDLE) begin
-					pc <= decoder_if_addr_in;
-					if_instqueue_en_out <= 1'b0;
-					if_icache_inst_addr_out <= decoder_if_addr_in;
-				end else if (state == PENDING) begin
-					pc_temp <= decoder_if_addr_in;
-					state <= LOCKED;
-				end
-			end else if (bp_if_en_in && state != LOCKED) begin
-				if (state == IDLE) begin
-					pc <= bp_if_pc_in;
-					if_instqueue_en_out <= 1'b0;
-					if_icache_inst_addr_out <= bp_if_pc_in;
-				end else if (state == PENDING) begin
-					pc_temp <= bp_if_pc_in;
-					state <= LOCKED;
-				end
+			end else if (decoder_if_en_in) begin
+				pc <= decoder_if_addr_in;
+				if_instqueue_en_out <= 1'b0;
+				if_icache_inst_addr_out <= decoder_if_addr_in;
+			end else if (bp_if_en_in) begin
+				pc <= bp_if_pc_in;
+				if_instqueue_en_out <= 1'b0;
+				if_icache_inst_addr_out <= bp_if_pc_in;
 			end else if (!icache_if_miss_in) begin
 				if (instqueue_if_rdy_in) begin
 					if_instqueue_en_out <= 1'b1;
 					if_instqueue_inst_out <= icache_if_inst_inst_in;
 					if_instqueue_pc_out <= pc;
-					pc <= state == IDLE ? pc + 4 : pc_temp;
-					if_icache_inst_addr_out <= state == IDLE ? pc + 4 : pc_temp;
-					state <= IDLE;
-				end else begin
-					if_instqueue_en_out <= 1'b0;
-					state <= PENDING;
-					pc_temp <= pc + 4;
-				end
+					pc <= pc + 4;
+					if_icache_inst_addr_out <= pc + 4;
+				end else if_instqueue_en_out <= 1'b0;
 			end else if_instqueue_en_out <= 1'b0;
 		end
 	end

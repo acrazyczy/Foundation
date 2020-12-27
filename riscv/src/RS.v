@@ -66,9 +66,7 @@ module RS(
 	reg in_LS_queue[`RSCount - 1 : 0];
 	reg[`RSWidth - 1 : 0] LS_queue[`RSCount - 1 : 0];
 	reg[`RSWidth - 1 : 0] head, tail;
-	reg[`RSWidth - 1 : 0] idlelist_head;
-	reg[`RSWidth - 1 : 0] idlelist_next[`RSCount - 1 : 0];
-	reg in_idlelist[`RSCount - 1 : 0];
+	reg[`RSWidth - 1 : 0] idle_first, idle_second;
 	integer i;
 
 //at posedge
@@ -94,38 +92,67 @@ module RS(
 		rs_alu_opcode_out <= `NOP;
 		rs_addrunit_opcode_out <= `NOP;
 		if (rst_in) begin
+			idle_first <= `RSWidth'b1;
+			idle_second <= `RSWidth'b10;
+			head <= `RSWidth'b0;
+			tail <= `RSWidth'b0;
 			for (i = 0;i < `RSCount;i = i + 1) begin
 				busy[i] <= 1'b0;
 				pc[i] <= `AddressWidth'b0;
+				in_LS_queue[i] <= 1'b0;
 			end
 		end else if (rdy_in) if (rob_rs_rst_in) begin
+			idle_first <= `RSWidth'b1;
+			idle_second <= `RSWidth'b10;
+			head <= `RSWidth'b0;
+			tail <= `RSWidth'b0;
 			for (i = 0;i < `RSCount;i = i + 1) begin
 				busy[i] <= 1'b0;
 				pc[i] <= `AddressWidth'b0;
+				in_LS_queue[i] <= 1'b0;
 			end
 		end else begin
+			idle_first <= idle_second;
+			idle_second <= `RSWidth'b0;
 			if (ready_to_alu != `RSWidth'b0) begin
 				busy[ready_to_alu] <= 1'b0;
 				pc[ready_to_alu] <= `AddressWidth'b0;
 			end
-			if (ready_to_addrunit != `RSWidth'b0 && (opcode[ready_to_addrunit] < `SB || opcode[ready_to_addrunit] > `SW)) begin
-				busy[ready_to_addrunit] <= 1'b0;
-				pc[ready_to_addrunit] <= `AddressWidth'b0;
+			if (ready_to_addrunit != `RSWidth'b0)
+				if (opcode[ready_to_addrunit] < `SB || opcode[ready_to_addrunit] > `SW) begin
+					busy[ready_to_addrunit] <= 1'b0;
+					pc[ready_to_addrunit] <= `AddressWidth'b0;
+				end else begin
+					in_LS_queue[LS_queue[head]] <= 1'b0;
+					head <= (head + 1) % `RSCount;
+				end
+			else if (head != tail && `LB <= opcode[LS_queue[head]] && opcode[LS_queue[head]] <= `LHU) begin
+				in_LS_queue[LS_queue[head]] <= 1'b0;
+				head <= (head + 1) % `RSCount;
 			end
 			if (ready_to_rob != `RSWidth'b0) begin
 				busy[ready_to_rob] <= 1'b0;
 				pc[ready_to_rob] <= `AddressWidth'b0;
 			end
 			if (dispatcher_rs_en_in) begin
-				busy[idlelist_head] <= 1'b1;
-				a[idlelist_head] <= dispatcher_rs_a_in;
-				qj[idlelist_head] <= dispatcher_rs_qj_in;
-				vj[idlelist_head] <= dispatcher_rs_vj_in;
-				qk[idlelist_head] <= dispatcher_rs_qk_in;
-				vk[idlelist_head] <= dispatcher_rs_vk_in;
-				dest[idlelist_head] <= dispatcher_rs_dest_in;
-				pc[idlelist_head] <= dispatcher_rs_pc_in;
-				opcode[idlelist_head] <= dispatcher_rs_opcode_in;
+				busy[idle_first] <= 1'b1;
+				a[idle_first] <= dispatcher_rs_a_in;
+				qj[idle_first] <= dispatcher_rs_qj_in;
+				vj[idle_first] <= dispatcher_rs_vj_in;
+				qk[idle_first] <= dispatcher_rs_qk_in;
+				vk[idle_first] <= dispatcher_rs_vk_in;
+				dest[idle_first] <= dispatcher_rs_dest_in;
+				pc[idle_first] <= dispatcher_rs_pc_in;
+				opcode[idle_first] <= dispatcher_rs_opcode_in;
+				if (`SB <= dispatcher_rs_opcode_in && dispatcher_rs_opcode_in <= `SW) begin
+					LS_queue[tail] <= idle_first;
+					in_LS_queue[idle_first] <= 1'b1;
+					tail <= (tail + 1) % `RSCount;
+				end else if (`LB <= dispatcher_rs_opcode_in && dispatcher_rs_opcode_in <= `LHU && head != tail) begin
+					LS_queue[tail] <= idle_first;
+					in_LS_queue[idle_first] <= 1'b1;
+					tail <= (tail + 1) % `RSCount;
+				end
 			end
 			for (i = 1;i < `RSCount;i = i + 1)
 				if (busy[i]) begin
@@ -200,71 +227,9 @@ module RS(
 						rs_alu_pc_out <= pc[i];
 						rs_alu_opcode_out <= opcode[i];
 					end
-				end
+				end else if (i != idle_first && i != idle_second) idle_second <= i;
 		end
 	end
 
-	always @(*) begin
-		if (rst_in) begin
-			idlelist_head = {`RSWidth{1'b1}};
-			head = `RSWidth'b0;
-			tail = `RSWidth'b0;
-			idlelist_next[0] = `RSWidth'b0;
-			for (i = 1;i < `RSCount;i = i + 1) begin
-				in_LS_queue[i] = 1'b0;
-				idlelist_next[i] = i - 1;
-				in_idlelist[i] = 1'b1;
-			end
-		end else if (rdy_in) if (rob_rs_rst_in) begin
-			idlelist_head = {`RSWidth{1'b1}};
-			head = `RSWidth'b0;
-			tail = `RSWidth'b0;
-			idlelist_next[0] = `RSWidth'b0;
-			for (i = 1;i < `RSCount;i = i + 1) begin
-				in_LS_queue[i] = 1'b0;
-				idlelist_next[i] = i - 1;
-				in_idlelist[i] = 1'b1;
-			end
-		end else begin
-			if (dispatcher_rs_en_in && busy[idlelist_head])
-				if (`SB <= dispatcher_rs_opcode_in && dispatcher_rs_opcode_in <= `SW) begin
-					LS_queue[tail] = idlelist_head;
-					in_LS_queue[idlelist_head] = 1'b1;
-					tail = (tail + 1) % `RSCount;
-				end else if (`LB <= dispatcher_rs_opcode_in && dispatcher_rs_opcode_in <= `LHU && head != tail) begin
-					LS_queue[tail] = idlelist_head;
-					in_LS_queue[idlelist_head] = 1'b1;
-					tail = (tail + 1) % `RSCount;
-				end
-			if (busy[idlelist_head]) begin
-				in_idlelist[idlelist_head] = 1'b0;
-				idlelist_head = idlelist_next[idlelist_head];
-			end
-			if (ready_to_addrunit != `RSCount'b0)
-				if (`LB <= opcode[ready_to_addrunit] && opcode[ready_to_addrunit] <= `LHU && !in_idlelist[ready_to_addrunit]) begin
-					idlelist_next[ready_to_addrunit] = idlelist_head;
-					idlelist_head = ready_to_addrunit;
-					in_idlelist[ready_to_addrunit] = 1'b1;
-				end else if (`SB <= opcode[ready_to_addrunit] && opcode[ready_to_addrunit] <= `SW && head != tail && LS_queue[head] == ready_to_addrunit) begin
-					in_LS_queue[LS_queue[head]] = 1'b0;
-					head = (head + 1) % `RSCount;
-					while (head != tail && `LB <= opcode[LS_queue[head]] && opcode[LS_queue[head]] <= `LHU) begin
-						in_LS_queue[LS_queue[head]] = 1'b0;
-						head = (head + 1) % `RSCount;
-					end
-				end
-			if (ready_to_alu != `RSCount'b0 && !in_idlelist[ready_to_alu]) begin
-				idlelist_next[ready_to_alu] = idlelist_head;
-				idlelist_head = ready_to_alu;
-				in_idlelist[ready_to_alu] = 1'b1;
-			end
-			if (ready_to_rob != `RSCount'b0 && !in_idlelist[ready_to_rob]) begin
-				idlelist_next[ready_to_rob] = idlelist_head;
-				idlelist_head = ready_to_rob;
-				in_idlelist[ready_to_rob] = 1'b1;
-			end
-		end
-	end
-
-	assign rs_rdy_out = (idlelist_head != `RSWidth'b0) && (idlelist_next[idlelist_head] != `RSWidth'b0);
+	assign rs_rdy_out = idle_first != `RSWidth'b0 && idle_second != `RSWidth'b0;
 endmodule : RS
