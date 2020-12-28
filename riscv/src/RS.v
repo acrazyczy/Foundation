@@ -193,7 +193,7 @@ module RS(
 								`SH: rs_rob_result_out <= vk[i][15 : 0];
 								`SW: rs_rob_result_out <= vk[i];
 							endcase
-						end else if (i != ready_to_addrunit && qj[i] == `ROBWidth'b0 && LS_queue[head] == i) begin
+						end else if (i != ready_to_addrunit && qj[i] == `ROBWidth'b0 && LS_queue[head] == i && head != tail) begin
 							ready_to_addrunit <= i;
 							rs_addrunit_a_out <= a[i];
 							rs_addrunit_vj_out <= vj[i];

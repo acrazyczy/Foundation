@@ -51,7 +51,7 @@ module instqueue(
 				end
 				instqueue_decoder_en_out <= 1'b0;
 			end else begin
-				if (if_instqueue_en_in && instqueue_if_rdy_out) begin
+				if (if_instqueue_en_in) begin
 					inst[tail] <= if_instqueue_inst_in;
 					pc[tail] <= if_instqueue_pc_in;
 					tail <= (tail + 1) % QueueCount;
@@ -66,6 +66,6 @@ module instqueue(
 		end
 	end
 
-	assign instqueue_if_rdy_out = head != (tail + 1) % QueueCount;
+	assign instqueue_if_rdy_out = (head != (tail + 1) % QueueCount) && (head != (tail + 2) % QueueCount);
 
 endmodule : instqueue

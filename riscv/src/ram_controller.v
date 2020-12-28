@@ -187,7 +187,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in;
 						ram_data_out = data_data_in[7 : 0];
-						$display("write %x to %x\n", data_data_in[7 : 0], data_addr_in);
+						// $display("write %x to %x\n", data_data_in[7 : 0], data_addr_in);
 					end
 				endcase
 			S1: case (current_rw_state)
@@ -205,7 +205,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in + 32'h1;
 						ram_data_out = data_data_in[15 : 8];
-						$display("write %x to %x\n", data_data_in[15 : 8], data_addr_in + 32'h1);
+						// $display("write %x to %x\n", data_data_in[15 : 8], data_addr_in + 32'h1);
 					end
 				endcase
 			S2: case (current_rw_state)
@@ -223,7 +223,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in + 32'h2;
 						ram_data_out = data_data_in[23 : 16];
-						$display("write %x to %x\n", data_data_in[23 : 16], data_addr_in + 32'h2);
+						// $display("write %x to %x\n", data_data_in[23 : 16], data_addr_in + 32'h2);
 					end
 				endcase
 			S3: case (current_rw_state)
@@ -241,7 +241,7 @@ module ram_controller(
 						ram_rw_out = 1'b0;
 						ram_addr_out = data_width_in + 32'h3;
 						ram_data_out = data_data_in[31 : 24];
-						$display("write %x to %x\n", data_data_in[31 : 24], data_addr_in + 32'h3);
+						// $display("write %x to %x\n", data_data_in[31 : 24], data_addr_in + 32'h3);
 					end
 				endcase
 			default: begin
