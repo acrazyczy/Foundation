@@ -118,13 +118,7 @@ module ram_controller(
 				end
 				WDATA: begin
 					inst_rdy_out <= 1'b0;
-					case (current_stage)
-						S0: data_rdy_out <= 1'b0;
-						S1: if (data_width_in == 3'b001) data_rdy_out <= 1'b1;
-						S2: if (data_width_in == 3'b010) data_rdy_out <= 1'b1;
-						OK1: data_rdy_out <= 1'b1;
-						default: data_rdy_out <= 1'b0;
-					endcase
+					data_rdy_out <= current_stage == OK1 ? 1'b1 : 1'b0;
 				end
 			endcase
 		end
@@ -147,15 +141,9 @@ module ram_controller(
 						else current_rw_state <= RINST;
 					end
 				end
-				S0: current_stage <= S1;
-				S1: begin
-					current_stage <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_in == 3'b001 ? IDLE : S2;
-					current_rw_state <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_in == 3'b001 ? NONE : current_rw_state;
-				end
-				S2: begin
-					current_stage <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_in == 3'b010 ? IDLE : S3;
-					current_rw_state <= (current_rw_state == RDATA || current_rw_state == WDATA) && data_width_in == 3'b010 ? NONE : current_rw_state;
-				end
+				S0: current_stage <= current_rw_state == WDATA && data_width_in == 3'b001 ? OK1 : S1;
+				S1: current_stage <= current_rw_state == WDATA && data_width_in == 3'b010 ? OK1 : (current_rw_state == RDATA && data_width_in == 3'b001 ? OK2 : S2);
+				S2: current_stage <= current_rw_state == RDATA && data_width_in == 3'b010 ? OK2 : S3;
 				S3: current_stage <= OK1;
 				OK1: current_stage <= OK2;
 				OK2: begin
@@ -187,7 +175,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in;
 						ram_data_out = data_data_in[7 : 0];
-						// $display("write %x to %x\n", data_data_in[7 : 0], data_addr_in);
+						$display("write %x to %x\n", data_data_in[7 : 0], data_addr_in);
 					end
 				endcase
 			S1: case (current_rw_state)
@@ -205,7 +193,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in + 32'h1;
 						ram_data_out = data_data_in[15 : 8];
-						// $display("write %x to %x\n", data_data_in[15 : 8], data_addr_in + 32'h1);
+						$display("write %x to %x\n", data_data_in[15 : 8], data_addr_in + 32'h1);
 					end
 				endcase
 			S2: case (current_rw_state)
@@ -223,7 +211,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in + 32'h2;
 						ram_data_out = data_data_in[23 : 16];
-						// $display("write %x to %x\n", data_data_in[23 : 16], data_addr_in + 32'h2);
+						$display("write %x to %x\n", data_data_in[23 : 16], data_addr_in + 32'h2);
 					end
 				endcase
 			S3: case (current_rw_state)
@@ -241,7 +229,7 @@ module ram_controller(
 						ram_rw_out = 1'b0;
 						ram_addr_out = data_width_in + 32'h3;
 						ram_data_out = data_data_in[31 : 24];
-						// $display("write %x to %x\n", data_data_in[31 : 24], data_addr_in + 32'h3);
+						$display("write %x to %x\n", data_data_in[31 : 24], data_addr_in + 32'h3);
 					end
 				endcase
 			default: begin

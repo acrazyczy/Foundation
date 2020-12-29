@@ -43,16 +43,16 @@ module regfile(
 					busy[i] <= 1'b0;
 					reorder[i] <= `ROBWidth'b0;
 				end
+			else if (dispatcher_regfile_rd_en_in && dispatcher_regfile_rd_in != `RegWidth'b0) begin
+				busy[dispatcher_regfile_rd_in] <= 1'b1;
+				reorder[dispatcher_regfile_rd_in] <= dispatcher_regfile_reorder_in;
+			end
 			if (rob_regfile_en_in && rob_regfile_d_in != `RegWidth'b0) begin
 				register[rob_regfile_d_in] <= rob_regfile_value_in;
 				if (reorder[rob_regfile_d_in] == rob_regfile_h_in) begin
 					busy[rob_regfile_d_in] <= 1'b0;
 					reorder[rob_regfile_d_in] <= `ROBWidth'b0;
 				end
-			end
-			if (dispatcher_regfile_rd_en_in && dispatcher_regfile_rd_in != `RegWidth'b0) begin
-				busy[dispatcher_regfile_rd_in] <= 1'b1;
-				reorder[dispatcher_regfile_rd_in] <= dispatcher_regfile_reorder_in;
 			end
 		end
 	end
