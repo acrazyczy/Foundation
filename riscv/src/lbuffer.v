@@ -47,16 +47,15 @@ module lbuffer(
 	localparam OK = 2'b11;
 
 	always @(posedge clk_in) begin
+		lbuffer_rob_h_out <= `ROBWidth'b0;
 		if (rst_in) begin
 			head <= `LBWidth'b1;
 			tail <= `LBWidth'b1;
-			lbuffer_rob_h_out <= `ROBWidth'b0;
 			for (i = 1;i < `LBCount;i = i + 1) busy[i] <= 1'b0;
 			stage <= IDLE;
 		end else if (rdy_in) if (rob_lbuffer_rst_in) begin
 			head <= `LBWidth'b1;
 			tail <= `LBWidth'b1;
-			lbuffer_rob_h_out <= `ROBWidth'b0;
 			for (i = 1;i < `LBCount;i = i + 1) busy[i] <= 1'b0;
 			stage <= IDLE;
 		end else begin
