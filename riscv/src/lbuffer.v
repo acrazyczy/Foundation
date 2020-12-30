@@ -133,6 +133,6 @@ module lbuffer(
 		end
 	end
 
-	assign lbuffer_rs_rdy_out = (head != tail % (`LBCount - 1) + 1) && (head != tail % (`LBCount - 1) + 2);
+	assign lbuffer_rs_rdy_out = (head != tail % (`LBCount - 1) + 1) && (head != (tail + 1) % (`LBCount - 1) + 1);
 	assign lbuffer_rob_index_out = dest[head];
 endmodule : lbuffer
