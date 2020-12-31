@@ -45,12 +45,15 @@ module ram_controller(
 	reg [3 : 0] current_stage;
 	reg [2 : 0] current_rw_state;
 	reg [`IDWidth - 1 : 0] data;
+	// integer counter;
 
 	always @(posedge clk_in) begin
 		if (rst_in) begin
+			// counter <= 0;
 			inst_rdy_out <= 1'b0;
 			data_rdy_out <= 1'b0;
 		end else if (rdy_in) begin
+			// counter <= counter + 1;
 			case (current_rw_state)
 				NONE: begin
 					inst_rdy_out <= 1'b0;
@@ -175,7 +178,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in;
 						ram_data_out = data_data_in[7 : 0];
-						// $display("write %x to %x\n", data_data_in[7 : 0], data_addr_in);
+						// $display("%x: write %x to %x\n", counter, data_data_in[7 : 0], data_addr_in);
 					end
 				endcase
 			S1: case (current_rw_state)
@@ -193,7 +196,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in + 32'h1;
 						ram_data_out = data_data_in[15 : 8];
-						// $display("write %x to %x\n", data_data_in[15 : 8], data_addr_in + 32'h1);
+						// $display("%x: write %x to %x\n", counter, data_data_in[15 : 8], data_addr_in + 32'h1);
 					end
 				endcase
 			S2: case (current_rw_state)
@@ -211,7 +214,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in + 32'h2;
 						ram_data_out = data_data_in[23 : 16];
-						// $display("write %x to %x\n", data_data_in[23 : 16], data_addr_in + 32'h2);
+						// $display("%x: write %x to %x\n", counter, data_data_in[23 : 16], data_addr_in + 32'h2);
 					end
 				endcase
 			S3: case (current_rw_state)
@@ -229,7 +232,7 @@ module ram_controller(
 						ram_rw_out = 1'b1;
 						ram_addr_out = data_addr_in + 32'h3;
 						ram_data_out = data_data_in[31 : 24];
-						// $display("write %x to %x\n", data_data_in[31 : 24], data_addr_in + 32'h3);
+						// $display("%x: write %x to %x\n", counter, data_data_in[31 : 24], data_addr_in + 32'h3);
 					end
 				endcase
 			default: begin
