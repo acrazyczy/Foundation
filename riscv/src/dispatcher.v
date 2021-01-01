@@ -57,30 +57,36 @@ module dispatcher(
 );
 
 	always @(*) begin
-		if (!rst_in && rdy_in && decoder_dispatcher_en_in) begin
-			dispatcher_regfile_rs_out = decoder_dispatcher_rs_in;
-			if (regfile_dispatcher_rs_busy_in) begin
-				dispatcher_rob_rs_h_out = regfile_dispatcher_rs_reorder_in;
-				if (rob_dispatcher_rs_ready_in) begin
-					dispatcher_rs_vj_out = rob_dispatcher_rs_value_in;
-					dispatcher_rs_qj_out = `ROBWidth'b0;
-				end else dispatcher_rs_qj_out = regfile_dispatcher_rs_reorder_in;
-			end else begin
-				dispatcher_rs_vj_out = regfile_dispatcher_rs_in;
+		dispatcher_regfile_rs_out = decoder_dispatcher_rs_in;
+		if (regfile_dispatcher_rs_busy_in) begin
+			dispatcher_rob_rs_h_out = regfile_dispatcher_rs_reorder_in;
+			if (rob_dispatcher_rs_ready_in) begin
+				dispatcher_rs_vj_out = rob_dispatcher_rs_value_in;
 				dispatcher_rs_qj_out = `ROBWidth'b0;
-			end
-
-			dispatcher_regfile_rt_out = decoder_dispatcher_rt_in;
-			if (regfile_dispatcher_rt_busy_in) begin
-				dispatcher_rob_rt_h_out = regfile_dispatcher_rt_reorder_in;
-				if (rob_dispatcher_rt_ready_in) begin
-					dispatcher_rs_vk_out = rob_dispatcher_rt_value_in;
-					dispatcher_rs_qk_out = `ROBWidth'b0;
-				end else dispatcher_rs_qk_out = regfile_dispatcher_rt_reorder_in;
 			end else begin
-				dispatcher_rs_vk_out = regfile_dispatcher_rt_in;
-				dispatcher_rs_qk_out = `ROBWidth'b0;
+				dispatcher_rs_vj_out = `IDWidth'b0;
+				dispatcher_rs_qj_out = regfile_dispatcher_rs_reorder_in;
 			end
+		end else begin
+			dispatcher_rob_rs_h_out = `ROBWidth'b0;
+			dispatcher_rs_vj_out = regfile_dispatcher_rs_in;
+			dispatcher_rs_qj_out = `ROBWidth'b0;
+		end
+
+		dispatcher_regfile_rt_out = decoder_dispatcher_rt_in;
+		if (regfile_dispatcher_rt_busy_in) begin
+			dispatcher_rob_rt_h_out = regfile_dispatcher_rt_reorder_in;
+			if (rob_dispatcher_rt_ready_in) begin
+				dispatcher_rs_vk_out = rob_dispatcher_rt_value_in;
+				dispatcher_rs_qk_out = `ROBWidth'b0;
+			end else begin
+				dispatcher_rs_vk_out = `IDWidth'b0;
+				dispatcher_rs_qk_out = regfile_dispatcher_rt_reorder_in;
+			end
+		end else begin
+			dispatcher_rob_rt_h_out = `ROBWidth'b0;
+			dispatcher_rs_vk_out = regfile_dispatcher_rt_in;
+			dispatcher_rs_qk_out = `ROBWidth'b0;
 		end
 	end
 

@@ -1,0 +1,705 @@
+#-----------------------------------------------------------
+# Vivado v2020.1 (64-bit)
+# SW Build 2902540 on Wed May 27 19:54:35 MDT 2020
+# IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
+# Start of session at: Fri Jan  1 21:16:19 2021
+# Process ID: 189099
+# Current directory: /home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1
+# Command line: vivado -log riscv_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source riscv_top.tcl
+# Log file: /home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1/riscv_top.vds
+# Journal file: /home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1/vivado.jou
+#-----------------------------------------------------------
+source riscv_top.tcl -notrace
+Command: synth_design -top riscv_top -part xc7a35tcpg236-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Device 21-403] Loading part xc7a35tcpg236-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 189157
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:05 . Memory (MB): peak = 2090.641 ; gain = 0.000 ; free physical = 6648 ; free virtual = 11621
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'riscv_top' [/home/crazy_cloud/Desktop/Foundation/riscv/src/riscv_top.v:4]
+	Parameter SIM bound to: 0 - type: integer 
+	Parameter SYS_CLK_FREQ bound to: 60000000 - type: integer 
+	Parameter UART_BAUD_RATE bound to: 115200 - type: integer 
+	Parameter RAM_ADDR_WIDTH bound to: 17 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_0' [/home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1/.Xil/Vivado-189099-VirtualBox-Ubuntu-20/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_0' (1#1) [/home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1/.Xil/Vivado-189099-VirtualBox-Ubuntu-20/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'ram' [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram.v:3]
+	Parameter ADDR_WIDTH bound to: 17 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'single_port_ram_sync' [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/block_ram/block_ram.v:62]
+	Parameter ADDR_WIDTH bound to: 17 - type: integer 
+	Parameter DATA_WIDTH bound to: 8 - type: integer 
+WARNING: [Synth 8-6896] loop limit (65536) exceeded inside initial block, initial block items will be ignored [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/block_ram/block_ram.v:90]
+INFO: [Synth 8-6155] done synthesizing module 'single_port_ram_sync' (2#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/block_ram/block_ram.v:62]
+INFO: [Synth 8-6155] done synthesizing module 'ram' (3#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram.v:3]
+INFO: [Synth 8-6157] synthesizing module 'cpu' [/home/crazy_cloud/Desktop/Foundation/riscv/src/cpu.v:6]
+INFO: [Synth 8-6157] synthesizing module 'addrunit' [/home/crazy_cloud/Desktop/Foundation/riscv/src/addrunit.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'addrunit' (4#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/addrunit.v:3]
+INFO: [Synth 8-6157] synthesizing module 'ALU' [/home/crazy_cloud/Desktop/Foundation/riscv/src/ALU.v:3]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ALU.v:26]
+INFO: [Synth 8-6155] done synthesizing module 'ALU' (5#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/ALU.v:3]
+INFO: [Synth 8-6157] synthesizing module 'BP' [/home/crazy_cloud/Desktop/Foundation/riscv/src/BP.v:3]
+	Parameter mask bound to: 127 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'BP' (6#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/BP.v:3]
+INFO: [Synth 8-6157] synthesizing module 'datactrl' [/home/crazy_cloud/Desktop/Foundation/riscv/src/datactrl.v:3]
+	Parameter IDLE bound to: 2'b00 
+	Parameter RDATA bound to: 2'b01 
+	Parameter WDATA bound to: 2'b10 
+	Parameter OK bound to: 2'b11 
+INFO: [Synth 8-6155] done synthesizing module 'datactrl' (7#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/datactrl.v:3]
+INFO: [Synth 8-6157] synthesizing module 'decoder' [/home/crazy_cloud/Desktop/Foundation/riscv/src/decoder.v:3]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/decoder.v:95]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/decoder.v:113]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/decoder.v:123]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/decoder.v:54]
+INFO: [Synth 8-6155] done synthesizing module 'decoder' (8#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/decoder.v:3]
+INFO: [Synth 8-6157] synthesizing module 'dispatcher' [/home/crazy_cloud/Desktop/Foundation/riscv/src/dispatcher.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'dispatcher' (9#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/dispatcher.v:3]
+INFO: [Synth 8-6157] synthesizing module 'icache' [/home/crazy_cloud/Desktop/Foundation/riscv/src/icache.v:3]
+	Parameter IndexWidth bound to: 7 - type: integer 
+	Parameter IndexCount bound to: 128 - type: integer 
+	Parameter TagWidth bound to: 23 - type: integer 
+	Parameter ByteSelectWidth bound to: 2 - type: integer 
+	Parameter ByteSelectCount bound to: 4 - type: integer 
+	Parameter BlockWidth bound to: 32 - type: integer 
+	Parameter IDLE bound to: 1'b0 
+	Parameter BUSY bound to: 1'b1 
+INFO: [Synth 8-6155] done synthesizing module 'icache' (10#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/icache.v:3]
+INFO: [Synth 8-6157] synthesizing module 'IF' [/home/crazy_cloud/Desktop/Foundation/riscv/src/IF.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'IF' (11#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/IF.v:3]
+INFO: [Synth 8-6157] synthesizing module 'instqueue' [/home/crazy_cloud/Desktop/Foundation/riscv/src/instqueue.v:3]
+	Parameter QueueCount bound to: 8 - type: integer 
+	Parameter QueueWidth bound to: 3 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'instqueue' (12#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/instqueue.v:3]
+INFO: [Synth 8-6157] synthesizing module 'lbuffer' [/home/crazy_cloud/Desktop/Foundation/riscv/src/lbuffer.v:3]
+	Parameter IDLE bound to: 2'b00 
+	Parameter PENDING bound to: 2'b01 
+	Parameter BUSY bound to: 2'b10 
+	Parameter OK bound to: 2'b11 
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/lbuffer.v:67]
+INFO: [Synth 8-6155] done synthesizing module 'lbuffer' (13#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/lbuffer.v:3]
+INFO: [Synth 8-6157] synthesizing module 'ram_controller' [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:3]
+	Parameter IDLE bound to: 3'b000 
+	Parameter S0 bound to: 3'b001 
+	Parameter S1 bound to: 3'b010 
+	Parameter S2 bound to: 3'b011 
+	Parameter S3 bound to: 3'b100 
+	Parameter OK1 bound to: 3'b101 
+	Parameter OK2 bound to: 3'b110 
+	Parameter NONE bound to: 2'b00 
+	Parameter RINST bound to: 2'b01 
+	Parameter RDATA bound to: 2'b10 
+	Parameter WDATA bound to: 2'b11 
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:57]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:135]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:165]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:183]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:201]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:219]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:164]
+INFO: [Synth 8-6155] done synthesizing module 'ram_controller' (14#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/ram_controller.v:3]
+INFO: [Synth 8-6157] synthesizing module 'regfile' [/home/crazy_cloud/Desktop/Foundation/riscv/src/regfile.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'regfile' (15#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/regfile.v:3]
+INFO: [Synth 8-6157] synthesizing module 'ROB' [/home/crazy_cloud/Desktop/Foundation/riscv/src/ROB.v:3]
+	Parameter IDLE bound to: 2'b00 
+	Parameter PENDING bound to: 2'b01 
+	Parameter BUSY bound to: 2'b10 
+Reason is one or more of the following :
+	1: RAM has multiple writes via different ports in same process. If RAM inferencing intended, write to one port per process. 
+	2: Unable to determine number of words or word size in RAM. 
+	3: No valid read/write found for RAM. 
+RAM "target_reg" dissolved into registers
+INFO: [Synth 8-6155] done synthesizing module 'ROB' (16#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/ROB.v:3]
+INFO: [Synth 8-6157] synthesizing module 'RS' [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:3]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:189]
+INFO: [Synth 8-6155] done synthesizing module 'RS' (17#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/RS.v:3]
+INFO: [Synth 8-6155] done synthesizing module 'cpu' (18#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/cpu.v:6]
+INFO: [Synth 8-6157] synthesizing module 'hci' [/home/crazy_cloud/Desktop/Foundation/riscv/src/hci.v:30]
+	Parameter SYS_CLK_FREQ bound to: 60000000 - type: integer 
+	Parameter RAM_ADDR_WIDTH bound to: 17 - type: integer 
+	Parameter BAUD_RATE bound to: 115200 - type: integer 
+	Parameter OP_ECHO bound to: 8'b00000000 
+	Parameter OP_CPU_REG_RD bound to: 8'b00000001 
+	Parameter OP_CPU_REG_WR bound to: 8'b00000010 
+	Parameter OP_DBG_BRK bound to: 8'b00000011 
+	Parameter OP_DBG_RUN bound to: 8'b00000100 
+	Parameter OP_IO_IN bound to: 8'b00000101 
+	Parameter OP_QUERY_DBG_BRK bound to: 8'b00000111 
+	Parameter OP_QUERY_ERR_CODE bound to: 8'b00001000 
+	Parameter OP_MEM_RD bound to: 8'b00001001 
+	Parameter OP_MEM_WR bound to: 8'b00001010 
+	Parameter OP_DISABLE bound to: 8'b00001011 
+	Parameter DBG_UART_PARITY_ERR bound to: 0 - type: integer 
+	Parameter DBG_UNKNOWN_OPCODE bound to: 1 - type: integer 
+	Parameter S_DISABLED bound to: 5'b00000 
+	Parameter S_DECODE bound to: 5'b00001 
+	Parameter S_ECHO_STG_0 bound to: 5'b00010 
+	Parameter S_ECHO_STG_1 bound to: 5'b00011 
+	Parameter S_IO_IN_STG_0 bound to: 5'b00100 
+	Parameter S_IO_IN_STG_1 bound to: 5'b00101 
+	Parameter S_CPU_REG_RD_STG0 bound to: 5'b00110 
+	Parameter S_CPU_REG_RD_STG1 bound to: 5'b00111 
+	Parameter S_QUERY_ERR_CODE bound to: 5'b01000 
+	Parameter S_MEM_RD_STG_0 bound to: 5'b01001 
+	Parameter S_MEM_RD_STG_1 bound to: 5'b01010 
+	Parameter S_MEM_WR_STG_0 bound to: 5'b01011 
+	Parameter S_MEM_WR_STG_1 bound to: 5'b01100 
+	Parameter S_DISABLE bound to: 5'b10000 
+	Parameter IO_IN_BUF_WIDTH bound to: 10 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'fifo' [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/fifo/fifo.v:27]
+	Parameter DATA_BITS bound to: 8 - type: integer 
+	Parameter ADDR_BITS bound to: 10 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'fifo' (19#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/fifo/fifo.v:27]
+INFO: [Synth 8-6157] synthesizing module 'uart' [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart.v:28]
+	Parameter SYS_CLK_FREQ bound to: 60000000 - type: integer 
+	Parameter BAUD_RATE bound to: 115200 - type: integer 
+	Parameter DATA_BITS bound to: 8 - type: integer 
+	Parameter STOP_BITS bound to: 1 - type: integer 
+	Parameter PARITY_MODE bound to: 1 - type: integer 
+	Parameter BAUD_CLK_OVERSAMPLE_RATE bound to: 16 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'uart_baud_clk' [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_baud_clk.v:29]
+	Parameter SYS_CLK_FREQ bound to: 60000000 - type: integer 
+	Parameter BAUD bound to: 115200 - type: integer 
+	Parameter BAUD_CLK_OVERSAMPLE_RATE bound to: 16 - type: integer 
+	Parameter CLKS_PER_OVERSAMPLE_TICK bound to: 16'b0000000000100000 
+INFO: [Synth 8-6155] done synthesizing module 'uart_baud_clk' (20#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_baud_clk.v:29]
+INFO: [Synth 8-6157] synthesizing module 'uart_rx' [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_rx.v:28]
+	Parameter DATA_BITS bound to: 8 - type: integer 
+	Parameter STOP_BITS bound to: 1 - type: integer 
+	Parameter PARITY_MODE bound to: 1 - type: integer 
+	Parameter BAUD_CLK_OVERSAMPLE_RATE bound to: 16 - type: integer 
+	Parameter STOP_OVERSAMPLE_TICKS bound to: 6'b010000 
+	Parameter S_IDLE bound to: 5'b00001 
+	Parameter S_START bound to: 5'b00010 
+	Parameter S_DATA bound to: 5'b00100 
+	Parameter S_PARITY bound to: 5'b01000 
+	Parameter S_STOP bound to: 5'b10000 
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_rx.v:101]
+INFO: [Synth 8-6155] done synthesizing module 'uart_rx' (21#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_rx.v:28]
+INFO: [Synth 8-6157] synthesizing module 'uart_tx' [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_tx.v:28]
+	Parameter DATA_BITS bound to: 8 - type: integer 
+	Parameter STOP_BITS bound to: 1 - type: integer 
+	Parameter PARITY_MODE bound to: 1 - type: integer 
+	Parameter BAUD_CLK_OVERSAMPLE_RATE bound to: 16 - type: integer 
+	Parameter STOP_OVERSAMPLE_TICKS bound to: 6'b010000 
+	Parameter S_IDLE bound to: 5'b00001 
+	Parameter S_START bound to: 5'b00010 
+	Parameter S_DATA bound to: 5'b00100 
+	Parameter S_PARITY bound to: 5'b01000 
+	Parameter S_STOP bound to: 5'b10000 
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_tx.v:101]
+INFO: [Synth 8-6155] done synthesizing module 'uart_tx' (22#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart_tx.v:28]
+INFO: [Synth 8-6157] synthesizing module 'fifo__parameterized0' [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/fifo/fifo.v:27]
+	Parameter DATA_BITS bound to: 8 - type: integer 
+	Parameter ADDR_BITS bound to: 3 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'fifo__parameterized0' (22#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/fifo/fifo.v:27]
+INFO: [Synth 8-6155] done synthesizing module 'uart' (23#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/common/uart/uart.v:28]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/hci.v:210]
+INFO: [Synth 8-251] IO:Return [/home/crazy_cloud/Desktop/Foundation/riscv/src/hci.v:261]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/hci.v:246]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/hci.v:266]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/crazy_cloud/Desktop/Foundation/riscv/src/hci.v:281]
+INFO: [Synth 8-6155] done synthesizing module 'hci' (24#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/hci.v:30]
+INFO: [Synth 8-6155] done synthesizing module 'riscv_top' (25#1) [/home/crazy_cloud/Desktop/Foundation/riscv/src/riscv_top.v:4]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:13 ; elapsed = 00:00:15 . Memory (MB): peak = 2314.707 ; gain = 224.066 ; free physical = 6547 ; free virtual = 11524
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:16 ; elapsed = 00:00:18 . Memory (MB): peak = 2329.551 ; gain = 238.910 ; free physical = 6584 ; free virtual = 11561
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:16 ; elapsed = 00:00:18 . Memory (MB): peak = 2329.551 ; gain = 238.910 ; free physical = 6584 ; free virtual = 11561
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00.25 ; elapsed = 00:00:00.26 . Memory (MB): peak = 2329.551 ; gain = 0.000 ; free physical = 6558 ; free virtual = 11534
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [/home/crazy_cloud/Desktop/Foundation/Foundation.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0/clk_wiz_0_in_context.xdc] for cell 'NEW_CLOCK'
+WARNING: [Vivado 12-584] No ports matched ''. [/home/crazy_cloud/Desktop/Foundation/Foundation.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0/clk_wiz_0_in_context.xdc:1]
+WARNING: [Vivado 12-584] No ports matched ''. [/home/crazy_cloud/Desktop/Foundation/Foundation.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0/clk_wiz_0_in_context.xdc:4]
+Finished Parsing XDC File [/home/crazy_cloud/Desktop/Foundation/Foundation.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0/clk_wiz_0_in_context.xdc] for cell 'NEW_CLOCK'
+Parsing XDC File [/home/crazy_cloud/Desktop/Foundation/riscv/src/Basys-3-Master.xdc]
+Finished Parsing XDC File [/home/crazy_cloud/Desktop/Foundation/riscv/src/Basys-3-Master.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [/home/crazy_cloud/Desktop/Foundation/riscv/src/Basys-3-Master.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/riscv_top_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/riscv_top_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2443.379 ; gain = 0.000 ; free physical = 6449 ; free virtual = 11426
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.07 ; elapsed = 00:00:00.07 . Memory (MB): peak = 2443.379 ; gain = 0.000 ; free physical = 6449 ; free virtual = 11426
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:28 ; elapsed = 00:00:31 . Memory (MB): peak = 2443.379 ; gain = 352.738 ; free physical = 6592 ; free virtual = 11569
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a35tcpg236-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:28 ; elapsed = 00:00:31 . Memory (MB): peak = 2443.379 ; gain = 352.738 ; free physical = 6592 ; free virtual = 11569
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+Applied set_property IO_BUFFER_TYPE = NONE for EXCLK. (constraint file  /home/crazy_cloud/Desktop/Foundation/Foundation.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0/clk_wiz_0_in_context.xdc, line 5).
+Applied set_property CLOCK_BUFFER_TYPE = NONE for EXCLK. (constraint file  /home/crazy_cloud/Desktop/Foundation/Foundation.srcs/sources_1/ip/clk_wiz_0_1/clk_wiz_0/clk_wiz_0_in_context.xdc, line 6).
+Applied set_property DONT_TOUCH = true for NEW_CLOCK. (constraint file  auto generated constraint, line ).
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:28 ; elapsed = 00:00:31 . Memory (MB): peak = 2443.379 ; gain = 352.738 ; free physical = 6592 ; free virtual = 11569
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'datactrl'
+INFO: [Synth 8-802] inferred FSM for state register 'stage_reg' in module 'lbuffer'
+INFO: [Synth 8-802] inferred FSM for state register 'current_stage_reg' in module 'ram_controller'
+INFO: [Synth 8-802] inferred FSM for state register 'stage_reg' in module 'ROB'
+INFO: [Synth 8-802] inferred FSM for state register 'q_state_reg' in module 'uart_rx'
+INFO: [Synth 8-802] inferred FSM for state register 'q_state_reg' in module 'uart_tx'
+INFO: [Synth 8-802] inferred FSM for state register 'q_state_reg' in module 'hci'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE1 |                               00 |                               00
+                  iSTATE |                               01 |                               10
+                 iSTATE0 |                               10 |                               01
+*
+                 iSTATE2 |                               11 |                               11
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'datactrl'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE1 |                             0001 |                               00
+                 iSTATE0 |                             0010 |                               01
+                  iSTATE |                             0100 |                               10
+                 iSTATE2 |                             1000 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'stage_reg' using encoding 'one-hot' in module 'lbuffer'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                    IDLE |                          0000001 |                             0000
+                      S0 |                          0000010 |                             0001
+                      S1 |                          0000100 |                             0010
+                      S2 |                          0001000 |                             0011
+                      S3 |                          0010000 |                             0100
+                     OK1 |                          0100000 |                             0101
+                     OK2 |                          1000000 |                             0110
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'current_stage_reg' using encoding 'one-hot' in module 'ram_controller'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE0 |                              001 |                               00
+*
+                 iSTATE1 |                              010 |                               01
+                  iSTATE |                              100 |                               10
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'stage_reg' using encoding 'one-hot' in module 'ROB'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+*
+                  S_IDLE |                            00001 |                            00001
+                 S_START |                            00010 |                            00010
+                  S_DATA |                            00100 |                            00100
+                S_PARITY |                            01000 |                            01000
+                  S_STOP |                            10000 |                            10000
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3898] No Re-encoding of one hot register 'q_state_reg' in module 'uart_rx'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+*
+                  S_IDLE |                            00001 |                            00001
+                 S_START |                            00010 |                            00010
+                  S_DATA |                            00100 |                            00100
+                S_PARITY |                            01000 |                            01000
+                  S_STOP |                            10000 |                            10000
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3898] No Re-encoding of one hot register 'q_state_reg' in module 'uart_tx'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                S_DECODE |                             0000 |                            00001
+            S_ECHO_STG_0 |                             0001 |                            00010
+            S_ECHO_STG_1 |                             0010 |                            00011
+           S_IO_IN_STG_0 |                             0011 |                            00100
+           S_IO_IN_STG_1 |                             0100 |                            00101
+        S_QUERY_ERR_CODE |                             0101 |                            01000
+          S_MEM_RD_STG_0 |                             0110 |                            01001
+          S_MEM_RD_STG_1 |                             0111 |                            01010
+          S_MEM_WR_STG_0 |                             1000 |                            01011
+          S_MEM_WR_STG_1 |                             1001 |                            01100
+       S_CPU_REG_RD_STG0 |                             1010 |                            00110
+       S_CPU_REG_RD_STG1 |                             1011 |                            00111
+                  iSTATE |                             1100 |                            10000
+              S_DISABLED |                             1101 |                            00000
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'q_state_reg' using encoding 'sequential' in module 'hci'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:43 ; elapsed = 00:00:48 . Memory (MB): peak = 2443.379 ; gain = 352.738 ; free physical = 6578 ; free virtual = 11558
+---------------------------------------------------------------------------------
+RAM Pipeline Warning: Read Address Register Found For RAM ram_reg. We will not be able to pipeline it. This may degrade performance. 
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   32 Bit       Adders := 15    
+	   3 Input   32 Bit       Adders := 1     
+	   2 Input   17 Bit       Adders := 2     
+	   2 Input   16 Bit       Adders := 1     
+	   2 Input   10 Bit       Adders := 6     
+	   3 Input   10 Bit       Adders := 4     
+	   2 Input    5 Bit       Adders := 6     
+	   2 Input    4 Bit       Adders := 11    
+	   2 Input    3 Bit       Adders := 7     
+	   3 Input    3 Bit       Adders := 2     
++---XORs : 
+	   2 Input     32 Bit         XORs := 2     
+	   3 Input      2 Bit         XORs := 1     
+	   2 Input      2 Bit         XORs := 1     
++---XORs : 
+	                8 Bit    Wide XORs := 2     
+	                2 Bit    Wide XORs := 1     
++---Registers : 
+	               32 Bit    Registers := 195   
+	               17 Bit    Registers := 3     
+	               16 Bit    Registers := 1     
+	               10 Bit    Registers := 4     
+	                8 Bit    Registers := 5     
+	                6 Bit    Registers := 34    
+	                5 Bit    Registers := 1     
+	                4 Bit    Registers := 93    
+	                3 Bit    Registers := 7     
+	                2 Bit    Registers := 129   
+	                1 Bit    Registers := 255   
++---RAMs : 
+	            1024K Bit	(131072 X 8 bit)          RAMs := 1     
+	               8K Bit	(1024 X 8 bit)          RAMs := 2     
+	               4K Bit	(128 X 32 bit)          RAMs := 1     
+	               2K Bit	(128 X 23 bit)          RAMs := 1     
+	              512 Bit	(16 X 32 bit)          RAMs := 1     
+	               96 Bit	(16 X 6 bit)          RAMs := 1     
+	               80 Bit	(16 X 5 bit)          RAMs := 1     
+	               64 Bit	(16 X 4 bit)          RAMs := 2     
+	               64 Bit	(8 X 8 bit)          RAMs := 1     
+	               16 Bit	(16 X 1 bit)          RAMs := 1     
++---Muxes : 
+	   2 Input  512 Bit        Muxes := 2     
+	   2 Input   32 Bit        Muxes := 1100  
+	   4 Input   32 Bit        Muxes := 64    
+	   3 Input   32 Bit        Muxes := 16    
+	   6 Input   32 Bit        Muxes := 3     
+	  10 Input   32 Bit        Muxes := 3     
+	   8 Input   32 Bit        Muxes := 1     
+	   7 Input   32 Bit        Muxes := 1     
+	   5 Input   32 Bit        Muxes := 1     
+	  33 Input   32 Bit        Muxes := 2     
+	  27 Input   32 Bit        Muxes := 1     
+	   2 Input   18 Bit        Muxes := 1     
+	   2 Input   17 Bit        Muxes := 10    
+	   4 Input   17 Bit        Muxes := 2     
+	   5 Input   17 Bit        Muxes := 1     
+	  14 Input   17 Bit        Muxes := 4     
+	   2 Input   16 Bit        Muxes := 4     
+	   2 Input    8 Bit        Muxes := 21    
+	   4 Input    8 Bit        Muxes := 5     
+	   5 Input    8 Bit        Muxes := 1     
+	   6 Input    8 Bit        Muxes := 1     
+	  14 Input    8 Bit        Muxes := 2     
+	   3 Input    8 Bit        Muxes := 1     
+	   7 Input    7 Bit        Muxes := 1     
+	   2 Input    7 Bit        Muxes := 5     
+	   2 Input    6 Bit        Muxes := 166   
+	   4 Input    6 Bit        Muxes := 15    
+	   9 Input    6 Bit        Muxes := 1     
+	  10 Input    6 Bit        Muxes := 1     
+	  10 Input    5 Bit        Muxes := 3     
+	   2 Input    5 Bit        Muxes := 11    
+	   9 Input    5 Bit        Muxes := 1     
+	   4 Input    5 Bit        Muxes := 1     
+	  30 Input    5 Bit        Muxes := 1     
+	   6 Input    5 Bit        Muxes := 2     
+	   2 Input    4 Bit        Muxes := 537   
+	   4 Input    4 Bit        Muxes := 23    
+	   5 Input    4 Bit        Muxes := 1     
+	   3 Input    4 Bit        Muxes := 2     
+	   6 Input    4 Bit        Muxes := 3     
+	   7 Input    4 Bit        Muxes := 1     
+	  33 Input    4 Bit        Muxes := 2     
+	  29 Input    4 Bit        Muxes := 1     
+	   2 Input    3 Bit        Muxes := 77    
+	   4 Input    3 Bit        Muxes := 5     
+	   3 Input    3 Bit        Muxes := 1     
+	   6 Input    3 Bit        Muxes := 3     
+	  10 Input    3 Bit        Muxes := 1     
+	   7 Input    3 Bit        Muxes := 1     
+	  14 Input    3 Bit        Muxes := 1     
+	   2 Input    2 Bit        Muxes := 38    
+	   4 Input    2 Bit        Muxes := 2     
+	   6 Input    2 Bit        Muxes := 1     
+	   2 Input    1 Bit        Muxes := 1980  
+	   4 Input    1 Bit        Muxes := 37    
+	   3 Input    1 Bit        Muxes := 63    
+	   6 Input    1 Bit        Muxes := 17    
+	  10 Input    1 Bit        Muxes := 2     
+	   5 Input    1 Bit        Muxes := 1     
+	   7 Input    1 Bit        Muxes := 2     
+	  33 Input    1 Bit        Muxes := 2     
+	  11 Input    1 Bit        Muxes := 3     
+	  14 Input    1 Bit        Muxes := 7     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 90 (col length:60)
+BRAMs: 100 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+RAM Pipeline Warning: Read Address Register Found For RAM ram0/ram_bram/ram_reg. We will not be able to pipeline it. This may degrade performance. 
+RAM Pipeline Warning: Read Address Register Found For RAM ram0/ram_bram/ram_reg. We will not be able to pipeline it. This may degrade performance. 
+RAM Pipeline Warning: Read Address Register Found For RAM ram0/ram_bram/ram_reg. We will not be able to pipeline it. This may degrade performance. 
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:02:16 ; elapsed = 00:02:24 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6495 ; free virtual = 11505
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Preliminary Mapping	Report (see note below)
++------------+-----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name | RTL Object            | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------+-----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|riscv_top   | ram0/ram_bram/ram_reg | 128 K x 8(WRITE_FIRST) | W | R |                        |   |   | Port A           | 0      | 32     | 
++------------+-----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+
+Distributed RAM: Preliminary Mapping	Report (see note below)
++---------------+---------------------------------------------+-----------+----------------------+----------------------------+
+|Module Name    | RTL Object                                  | Inference | Size (Depth x Width) | Primitives                 | 
++---------------+---------------------------------------------+-----------+----------------------+----------------------------+
+|riscv_top      | LS_queue_reg                                | Implied   | 16 x 4               | RAM32M x 1	                | 
+|cpu0i_3/ROB    | bp_taken_reg                                | Implied   | 16 x 1               | RAM16X1D x 1	              | 
+|cpu0i_3/ROB    | dest_reg                                    | Implied   | 16 x 5               | RAM32M x 1	                | 
+|riscv_top      | lbuffer/a_reg                               | Implied   | 16 x 32              | RAM32M x 6	                | 
+|riscv_top      | lbuffer/opcode_reg                          | Implied   | 16 x 6               | RAM32M x 1	                | 
+|riscv_top      | lbuffer/dest_reg                            | Implied   | 16 x 4               | RAM32M x 1	                | 
+|cpu0i_4/icache | tag_reg                                     | Implied   | 128 x 23             | RAM64X1D x 4	RAM64M x 14	  | 
+|cpu0i_4/icache | value_reg                                   | Implied   | 128 x 32             | RAM64X1D x 4	RAM64M x 20	  | 
+|riscv_top      | hci0/io_in_fifo/q_data_array_reg            | Implied   | 1 K x 8              | RAM64X1D x 32	RAM64M x 32	 | 
+|riscv_top      | hci0/uart_blk/uart_tx_fifo/q_data_array_reg | Implied   | 1 K x 8              | RAM64X1D x 32	RAM64M x 32	 | 
+|riscv_top      | hci0/uart_blk/uart_rx_fifo/q_data_array_reg | Implied   | 8 x 8                | RAM32M x 2	                | 
++---------------+---------------------------------------------+-----------+----------------------+----------------------------+
+
+Note: The table above is a preliminary report that shows the Distributed RAMs at the current stage of the synthesis flow. Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow. Multiple instantiated RAMs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:02:23 ; elapsed = 00:02:33 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6397 ; free virtual = 11407
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:02:28 ; elapsed = 00:02:37 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6384 ; free virtual = 11396
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping	Report
++------------+-----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name | RTL Object            | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------+-----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|riscv_top   | ram0/ram_bram/ram_reg | 128 K x 8(WRITE_FIRST) | W | R |                        |   |   | Port A           | 0      | 32     | 
++------------+-----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+
+Distributed RAM: Final Mapping	Report
++---------------+---------------------------------------------+-----------+----------------------+----------------------------+
+|Module Name    | RTL Object                                  | Inference | Size (Depth x Width) | Primitives                 | 
++---------------+---------------------------------------------+-----------+----------------------+----------------------------+
+|riscv_top      | LS_queue_reg                                | Implied   | 16 x 4               | RAM32M x 1	                | 
+|cpu0i_3/ROB    | bp_taken_reg                                | Implied   | 16 x 1               | RAM16X1D x 1	              | 
+|cpu0i_3/ROB    | dest_reg                                    | Implied   | 16 x 5               | RAM32M x 1	                | 
+|riscv_top      | lbuffer/a_reg                               | Implied   | 16 x 32              | RAM32M x 6	                | 
+|riscv_top      | lbuffer/opcode_reg                          | Implied   | 16 x 6               | RAM32M x 1	                | 
+|riscv_top      | lbuffer/dest_reg                            | Implied   | 16 x 4               | RAM32M x 1	                | 
+|cpu0i_4/icache | tag_reg                                     | Implied   | 128 x 23             | RAM64X1D x 4	RAM64M x 14	  | 
+|cpu0i_4/icache | value_reg                                   | Implied   | 128 x 32             | RAM64X1D x 4	RAM64M x 20	  | 
+|riscv_top      | hci0/io_in_fifo/q_data_array_reg            | Implied   | 1 K x 8              | RAM64X1D x 32	RAM64M x 32	 | 
+|riscv_top      | hci0/uart_blk/uart_tx_fifo/q_data_array_reg | Implied   | 1 K x 8              | RAM64X1D x 32	RAM64M x 32	 | 
+|riscv_top      | hci0/uart_blk/uart_rx_fifo/q_data_array_reg | Implied   | 8 x 8                | RAM32M x 2	                | 
++---------------+---------------------------------------------+-----------+----------------------+----------------------------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_2 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_3 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_4 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_5 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_6 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_1_7 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_2 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_3 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_4 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_5 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_6 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ram0/ram_bram/ram_reg_3_7 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:02:40 ; elapsed = 00:02:49 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6388 ; free virtual = 11398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:02:44 ; elapsed = 00:02:54 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6387 ; free virtual = 11398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:02:44 ; elapsed = 00:02:54 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6387 ; free virtual = 11398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:02:47 ; elapsed = 00:02:56 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6387 ; free virtual = 11398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:02:47 ; elapsed = 00:02:56 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6387 ; free virtual = 11398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:02:49 ; elapsed = 00:02:59 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6387 ; free virtual = 11397
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:02:49 ; elapsed = 00:02:59 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6387 ; free virtual = 11397
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+--------------+----------+
+|      |BlackBox name |Instances |
++------+--------------+----------+
+|1     |clk_wiz_0     |         1|
++------+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |clk_wiz  |     1|
+|2     |CARRY4   |   217|
+|3     |LUT1     |    36|
+|4     |LUT2     |  1216|
+|5     |LUT3     |  1255|
+|6     |LUT4     |  1666|
+|7     |LUT5     |  4085|
+|8     |LUT6     |  8684|
+|9     |MUXF7    |   826|
+|10    |MUXF8    |   291|
+|11    |RAM32M   |     9|
+|12    |RAM64M   |    98|
+|13    |RAM64X1D |    72|
+|14    |RAMB36E1 |    32|
+|16    |FDCE     |    59|
+|17    |FDPE     |     6|
+|18    |FDRE     |  7153|
+|19    |FDSE     |    13|
+|20    |IBUF     |     2|
+|21    |OBUF     |     2|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:02:49 ; elapsed = 00:02:59 . Memory (MB): peak = 2861.277 ; gain = 770.637 ; free physical = 6387 ; free virtual = 11397
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:02:43 ; elapsed = 00:02:54 . Memory (MB): peak = 2861.277 ; gain = 656.809 ; free physical = 6435 ; free virtual = 11446
+Synthesis Optimization Complete : Time (s): cpu = 00:02:49 ; elapsed = 00:02:59 . Memory (MB): peak = 2861.285 ; gain = 770.637 ; free physical = 6435 ; free virtual = 11446
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00.22 ; elapsed = 00:00:00.23 . Memory (MB): peak = 2861.285 ; gain = 0.000 ; free physical = 6507 ; free virtual = 11518
+INFO: [Netlist 29-17] Analyzing 1545 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2861.285 ; gain = 0.000 ; free physical = 6465 ; free virtual = 11475
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 179 instances were transformed.
+  RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 9 instances
+  RAM64M => RAM64M (RAMD64E(x4)): 98 instances
+  RAM64X1D => RAM64X1D (RAMD64E(x2)): 72 instances
+
+INFO: [Common 17-83] Releasing license: Synthesis
+132 Infos, 3 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:03:01 ; elapsed = 00:03:08 . Memory (MB): peak = 2861.285 ; gain = 770.719 ; free physical = 6636 ; free virtual = 11646
+INFO: [Common 17-1381] The checkpoint '/home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1/riscv_top.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file riscv_top_utilization_synth.rpt -pb riscv_top_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Fri Jan  1 21:19:41 2021...

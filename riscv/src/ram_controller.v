@@ -158,11 +158,10 @@ module ram_controller(
 	end
 
 	always @(*) begin
-		if (rst_in) begin
-			ram_rw_out = 1'b0;
-			ram_addr_out = {`AddressWidth{1'b0}};
-			ram_data_out = {`IDWidth{1'b0}};
-		end else if (rdy_in) case (current_stage)
+		ram_rw_out = 1'b0;
+		ram_addr_out = {`AddressWidth{1'b0}};
+		ram_data_out = {`IDWidth{1'b0}};
+		if (!rst_in) case (current_stage)
 			S0: case (current_rw_state)
 					RINST: begin
 						ram_rw_out = 1'b0;
@@ -235,11 +234,6 @@ module ram_controller(
 						// $display("%x: write %x to %x\n", counter, data_data_in[31 : 24], data_addr_in + 32'h3);
 					end
 				endcase
-			default: begin
-				ram_rw_out = 1'b0;
-				ram_addr_out = {`AddressWidth{1'b0}};
-				ram_data_out = {`IDWidth{1'b0}};
-			end
 		endcase
 	end
 

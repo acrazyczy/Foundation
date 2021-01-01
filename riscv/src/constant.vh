@@ -7,12 +7,12 @@
 `define RegCount 32
 `define RegWidth 5
 `define InstTypeWidth 6
-`define ROBCount 32
-`define ROBWidth 5
-`define RSCount 32
-`define RSWidth 5
-`define LBCount 32
-`define LBWidth 5
+`define ROBCount 16
+`define ROBWidth 4
+`define RSCount 16
+`define RSWidth 4
+`define LBCount 16
+`define LBWidth 4
 
 //Instruction Type
 `define NOP 6'b000000

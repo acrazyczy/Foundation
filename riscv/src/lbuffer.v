@@ -24,8 +24,8 @@ module lbuffer(
 	output wire lbuffer_rs_rdy_out,
 
 	//from & to datactrl
-	output reg lbuffer_datactrl_en_out,
-	output reg[`AddressWidth - 1 : 0] lbuffer_datactrl_addr_out,
+	output wire lbuffer_datactrl_en_out,
+	output wire[`AddressWidth - 1 : 0] lbuffer_datactrl_addr_out,
 	output reg[2 : 0] lbuffer_datactrl_width_out,
 	output reg lbuffer_datactrl_sgn_out,
 	input wire datactrl_lbuffer_en_in,
@@ -99,40 +99,36 @@ module lbuffer(
 	end
 
 	always @(*) begin
-		if (rst_in) begin
-			lbuffer_datactrl_en_out = 1'b0;
-		end else if (rdy_in) if (rob_lbuffer_rst_in) begin
-			lbuffer_datactrl_en_out = 1'b0;
-		end else begin
-			if (stage == PENDING) begin
-				lbuffer_datactrl_en_out = 1'b1;
-				lbuffer_datactrl_addr_out = a[head];
-				case (opcode[head])
-					`LB: begin
-						lbuffer_datactrl_sgn_out = 1'b1;
-						lbuffer_datactrl_width_out = 3'b001;
-					end
-					`LH: begin
-						lbuffer_datactrl_sgn_out = 1'b1;
-						lbuffer_datactrl_width_out = 3'b010;
-					end
-					`LW: begin
-						lbuffer_datactrl_sgn_out = 1'b0;
-						lbuffer_datactrl_width_out = 3'b100;
-					end
-					`LBU: begin
-						lbuffer_datactrl_sgn_out = 1'b0;
-						lbuffer_datactrl_width_out = 3'b001;
-					end
-					`LHU: begin
-						lbuffer_datactrl_sgn_out = 1'b0;
-						lbuffer_datactrl_width_out = 3'b010;
-					end
-				endcase
-			end else if (stage == BUSY && datactrl_lbuffer_en_in) lbuffer_datactrl_en_out = 1'b0;
-		end
+		case (opcode[head])
+			`LB: begin
+				lbuffer_datactrl_sgn_out = 1'b1;
+				lbuffer_datactrl_width_out = 3'b001;
+			end
+			`LH: begin
+				lbuffer_datactrl_sgn_out = 1'b1;
+				lbuffer_datactrl_width_out = 3'b010;
+			end
+			`LW: begin
+				lbuffer_datactrl_sgn_out = 1'b0;
+				lbuffer_datactrl_width_out = 3'b100;
+			end
+			`LBU: begin
+				lbuffer_datactrl_sgn_out = 1'b0;
+				lbuffer_datactrl_width_out = 3'b001;
+			end
+			`LHU: begin
+				lbuffer_datactrl_sgn_out = 1'b0;
+				lbuffer_datactrl_width_out = 3'b010;
+			end
+			default: begin
+				lbuffer_datactrl_sgn_out = 1'b0;
+				lbuffer_datactrl_width_out = 3'b000;
+			end
+		endcase
 	end
 
+	assign lbuffer_datactrl_addr_out = a[head];
+	assign lbuffer_datactrl_en_out = stage == PENDING || stage == BUSY && !datactrl_lbuffer_en_in;
 	assign lbuffer_rs_rdy_out = (head != tail % (`LBCount - 1) + 1) && (head != (tail + 1) % (`LBCount - 1) + 1);
 	assign lbuffer_rob_index_out = dest[head];
 endmodule : lbuffer

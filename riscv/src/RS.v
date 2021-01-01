@@ -30,8 +30,6 @@ module RS(
 	//to addresss unit
 	output reg[`IDWidth - 1 : 0] rs_addrunit_a_out,
 	output reg[`IDWidth - 1 : 0] rs_addrunit_vj_out,
-	output reg[`ROBWidth - 1 : 0] rs_addrunit_qk_out,
-	output reg[`IDWidth - 1 : 0] rs_addrunit_vk_out,
 	output reg[`ROBWidth - 1 : 0] rs_addrunit_dest_out,
 	output reg[`InstTypeWidth - 1 : 0] rs_addrunit_opcode_out,
 

@@ -35,6 +35,16 @@ module decoder(
 	always @(*) begin
 		decoder_instqueue_rst_out = 1'b0;
 		decoder_bp_en_out = 1'b0;
+		decoder_dispatcher_rs_out = `RegWidth'b0;
+		decoder_dispatcher_rt_out = `RegWidth'b0;
+		decoder_dispatcher_rd_out = `RegWidth'b0;
+		decoder_dispatcher_imm_out = `IDWidth'b0;
+		decoder_dispatcher_opcode_out = `InstTypeWidth'b0;
+		decoder_dispatcher_target_out = `AddressWidth'b0;
+		decoder_dispatcher_pc_out = `AddressWidth'b0;
+		decoder_if_addr_out = `AddressWidth'b0;
+		decoder_bp_target_out = `AddressWidth'b0;
+		decoder_bp_pc_out = `AddressWidth'b0;
 		if (rst_in || rob_decoder_rst_in) begin
 			decoder_bp_en_out = 1'b0;
 			decoder_dispatcher_opcode_out = `NOP;

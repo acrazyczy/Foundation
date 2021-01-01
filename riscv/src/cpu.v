@@ -588,13 +588,11 @@ wire stall = !rs_rdy || !rob_rdy;
 		.lbuffer_rs_rdy_in      (lbuffer_rs_rdy),
 
 		.rs_rob_h_out           (rs_rob_h),
-		.rs_rob_result_out       (rs_rob_result),
+		.rs_rob_result_out      (rs_rob_result),
 		.rob_rs_rst_in          (rob_rst),
 
 		.rs_addrunit_a_out      (rs_addrunit_a),
 		.rs_addrunit_vj_out     (rs_addrunit_vj),
-		.rs_addrunit_qk_out     (rs_addrunit_qk),
-		.rs_addrunit_vk_out     (rs_addrunit_vk),
 		.rs_addrunit_dest_out   (rs_addrunit_dest),
 		.rs_addrunit_opcode_out (rs_addrunit_opcode),
 

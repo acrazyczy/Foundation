@@ -60,10 +60,10 @@ module ROB(
 	input wire[`IDWidth - 1 : 0] rs_rob_result_in,
 
 	//from & to datactrl
-	output reg rob_datactrl_en_out,
-	output reg[`AddressWidth - 1 : 0] rob_datactrl_addr_out,
+	output wire rob_datactrl_en_out,
+	output wire[`AddressWidth - 1 : 0] rob_datactrl_addr_out,
 	output reg[2 : 0] rob_datactrl_width_out,
-	output reg[`IDWidth - 1 : 0] rob_datactrl_data_out,
+	output wire[`IDWidth - 1 : 0] rob_datactrl_data_out,
 	input wire datactrl_rob_en_in
 );
 //from 1 to ROBCount - 1
@@ -176,42 +176,43 @@ module ROB(
 	end
 
 	always @(*) begin
-		if (rst_in) begin
-			rob_datactrl_en_out = 1'b0;
-		end else if (rdy_in) begin
-			if (stage == PENDING) begin
-				rob_datactrl_en_out = 1'b1;
-				rob_datactrl_addr_out = address[head];
-				rob_datactrl_data_out = value[head];
-				case (opcode[head])
-					`SB: rob_datactrl_width_out = 3'b001;
-					`SH: rob_datactrl_width_out = 3'b010;
-					`SW: rob_datactrl_width_out = 3'b100;
-				endcase
-			end else if (stage == BUSY && datactrl_rob_en_in) rob_datactrl_en_out = 1'b0;
-			rob_lbuffer_disambiguation_out = 1'b1;
-			rob_lbuffer_forwarding_en_out = 1'b0;
-			for (i = 1;i < `ROBCount;i = i + 1)
-				if (busy[i] && head <= i && (i < lbuffer_rob_index_in || lbuffer_rob_index_in < head) && `SB <= opcode[i] && opcode[i] <= `SW)
-					if (address[i] == address[lbuffer_rob_index_in]) begin
-						rob_lbuffer_disambiguation_out = 1'b0;
-						if (ready[i]) begin
-							rob_lbuffer_forwarding_en_out = 1'b1;
-							rob_lbuffer_forwarding_data_out = value[i];
-						end else rob_lbuffer_forwarding_en_out = 1'b0;
-					end
-			for (i = 1;i < `ROBCount;i = i + 1)
-				if (busy[i] && i < lbuffer_rob_index_in && lbuffer_rob_index_in < head && `SB <= opcode[i] && opcode[i] <= `SW)
-					if (address[i] == address[lbuffer_rob_index_in]) begin
-						rob_lbuffer_disambiguation_out = 1'b0;
-						if (ready[i]) begin
-							rob_lbuffer_forwarding_en_out = 1'b1;
-							rob_lbuffer_forwarding_data_out = value[i];
-						end else rob_lbuffer_forwarding_en_out = 1'b0;
-					end
-		end
+		case (opcode[head])
+			`SB: rob_datactrl_width_out = 3'b001;
+			`SH: rob_datactrl_width_out = 3'b010;
+			`SW: rob_datactrl_width_out = 3'b100;
+			default: rob_datactrl_width_out = 3'b000;
+		endcase
+		rob_lbuffer_disambiguation_out = 1'b1;
+		rob_lbuffer_forwarding_en_out = 1'b0;
+		rob_lbuffer_forwarding_data_out = `IDWidth'b0;
+		for (i = 1;i < `ROBCount;i = i + 1)
+			if (busy[i] && head <= i && (i < lbuffer_rob_index_in || lbuffer_rob_index_in < head) && `SB <= opcode[i] && opcode[i] <= `SW)
+				if (address[i] == address[lbuffer_rob_index_in]) begin
+					rob_lbuffer_disambiguation_out = 1'b0;
+					if (ready[i]) begin
+						rob_lbuffer_forwarding_en_out = 1'b1;
+						rob_lbuffer_forwarding_data_out = value[i];
+					end else rob_lbuffer_forwarding_en_out = 1'b0;
+				end
+		for (i = 1;i < `ROBCount;i = i + 1)
+			if (busy[i] && i < lbuffer_rob_index_in && lbuffer_rob_index_in < head && `SB <= opcode[i] && opcode[i] <= `SW)
+				if (address[i] == address[lbuffer_rob_index_in]) begin
+					rob_lbuffer_disambiguation_out = 1'b0;
+					if (ready[i]) begin
+						rob_lbuffer_forwarding_en_out = 1'b1;
+						rob_lbuffer_forwarding_data_out = value[i];
+					end else rob_lbuffer_forwarding_en_out = 1'b0;
+				end
+		/*if (address[lbuffer_rob_index_in] == 18'h30004)
+			if (lbuffer_rob_index_in == head) begin
+				rob_lbuffer_disambiguation_out = 1'b0;
+				rob_lbuffer_forwarding_en_out = 1'b0;
+			end	else rob_lbuffer_disambiguation_out = 1'b1;*/
 	end
 
+	assign rob_datactrl_addr_out = address[head];
+	assign rob_datactrl_data_out = value[head];
+	assign rob_datactrl_en_out = stage == PENDING || stage == BUSY && !datactrl_rob_en_in;
 	assign rob_rdy_out = (head != tail % (`ROBCount - 1) + 1) && (head != (tail + 1) % (`ROBCount - 1) + 1);
 	assign rob_dispatcher_rs_ready_out = ready[dispatcher_rob_rs_h_in] || alu_rob_h_in == dispatcher_rob_rs_h_in || lbuffer_rob_h_in == dispatcher_rob_rs_h_in;
 	assign rob_dispatcher_rs_value_out = alu_rob_h_in == dispatcher_rob_rs_h_in ? alu_rob_result_in : (lbuffer_rob_h_in == dispatcher_rob_rs_h_in ? lbuffer_rob_result_in : value[dispatcher_rob_rs_h_in]);

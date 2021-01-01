@@ -16,11 +16,11 @@ module icache(
 	output reg[`AddressWidth - 1 : 0] icache_ramctrl_addr_out,
 	input wire[`IDWidth - 1 : 0] ramctrl_icache_inst_inst_in
 );
-//1 KiB i-cache
+//512 B i-cache
 
-	localparam IndexWidth = 8;
-	localparam IndexCount = 256;
-	localparam TagWidth = 22;
+	localparam IndexWidth = 7;
+	localparam IndexCount = 128;
+	localparam TagWidth = 23;
 	localparam ByteSelectWidth = 2;
 	localparam ByteSelectCount = 4;
 	localparam BlockWidth = 32;

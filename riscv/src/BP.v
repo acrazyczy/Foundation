@@ -12,7 +12,7 @@ module BP(
 	input wire[`AddressWidth - 1 : 0] decoder_bp_target_in,
 
 	//to instruction fetch
-	output reg[`AddressWidth - 1 : 0] bp_if_pc_out,
+	output wire[`AddressWidth - 1 : 0] bp_if_pc_out,
 
 	//from reorder buffer
 	input wire rob_bp_en_in,
@@ -24,20 +24,16 @@ module BP(
 	reg[1 : 0] prediction[mask : 0];
 	integer i;
 
-	always @(*) begin
-		if (rst_in) begin
-			for (i = 0;i <= mask;i = i + 1) prediction[i] = 2'b01;
-		end else if (rdy_in) begin
-			if (decoder_bp_en_in)
-				if (prediction[(decoder_bp_pc_in >> 2) & mask] > 2'b01) bp_if_pc_out = decoder_bp_target_in;
-				else bp_if_pc_out = decoder_bp_pc_in + 4;
-			if (rob_bp_en_in)
-				if (rob_bp_correct_in)
-					prediction[(rob_bp_pc_in >> 2) & mask] = prediction[(rob_bp_pc_in >> 2) & mask] ^ (^ prediction[(rob_bp_pc_in >> 2) & mask]);
-				else
-					prediction[(rob_bp_pc_in >> 2) & mask] = prediction[(rob_bp_pc_in >> 2) & mask] ^ 1 ^ ((^ prediction[(rob_bp_pc_in >> 2) & mask]) << 1);
+	always @(posedge clk_in) begin
+		if (rst_in) for (i = 0;i <= mask;i = i + 1) prediction[i] <= 2'b01;
+		else if (rdy_in && rob_bp_en_in) begin
+			if (rob_bp_correct_in)
+				prediction[(rob_bp_pc_in >> 2) & mask] <= prediction[(rob_bp_pc_in >> 2) & mask] ^ (^ prediction[(rob_bp_pc_in >> 2) & mask]);
+			else
+				prediction[(rob_bp_pc_in >> 2) & mask] <= prediction[(rob_bp_pc_in >> 2) & mask] ^ 1 ^ ((^ prediction[(rob_bp_pc_in >> 2) & mask]) << 1);
 		end
 	end
 
-	assign bp_taken_out = !rst_in && decoder_bp_en_in && (prediction[(decoder_bp_pc_in >> 2) & mask] > 2'b01);
+	assign bp_taken_out = decoder_bp_en_in && (prediction[(decoder_bp_pc_in >> 2) & mask] > 2'b01);
+	assign bp_if_pc_out = prediction[(decoder_bp_pc_in >> 2) & mask] > 2'b01 ? decoder_bp_target_in : decoder_bp_pc_in + 4;
 endmodule : BP
