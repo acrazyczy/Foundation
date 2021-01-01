@@ -27,7 +27,7 @@ def collect_test_cases():
     return test_cases
 
 def main():
-    program_device()
+    #program_device()
     test_cases = collect_test_cases()
 
     print('Build controller...')

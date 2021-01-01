@@ -203,11 +203,12 @@ module ROB(
 						rob_lbuffer_forwarding_data_out = value[i];
 					end else rob_lbuffer_forwarding_en_out = 1'b0;
 				end
-		/*if (address[lbuffer_rob_index_in] == 18'h30004)
-			if (lbuffer_rob_index_in == head) begin
+		if (address[lbuffer_rob_index_in] == 18'h30004)
+			if (lbuffer_rob_index_in == head) rob_lbuffer_disambiguation_out = 1'b1;
+			else begin
 				rob_lbuffer_disambiguation_out = 1'b0;
 				rob_lbuffer_forwarding_en_out = 1'b0;
-			end	else rob_lbuffer_disambiguation_out = 1'b1;*/
+			end
 	end
 
 	assign rob_datactrl_addr_out = address[head];

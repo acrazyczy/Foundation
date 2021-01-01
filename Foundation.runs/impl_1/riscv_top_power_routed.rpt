@@ -1,7 +1,7 @@
 Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2020.1 (lin64) Build 2902540 Wed May 27 19:54:35 MDT 2020
-| Date             : Fri Jan  1 21:23:48 2021
+| Date             : Fri Jan  1 21:36:48 2021
 | Host             : VirtualBox-Ubuntu-20 running 64-bit Ubuntu 20.04.1 LTS
 | Command          : report_power -file riscv_top_power_routed.rpt -pb riscv_top_power_summary_routed.pb -rpx riscv_top_power_routed.rpx
 | Design           : riscv_top
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.231        |
+| Total On-Chip Power (W)  | 0.229        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.158        |
+| Dynamic (W)              | 0.156        |
 | Device Static (W)        | 0.074        |
 | Effective TJA (C/W)      | 5.0          |
-| Max Ambient (C)          | 83.8         |
-| Junction Temperature (C) | 26.2         |
+| Max Ambient (C)          | 83.9         |
+| Junction Temperature (C) | 26.1         |
 | Confidence Level         | Medium       |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -53,19 +53,19 @@ Table of Contents
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
 | Clocks                   |     0.011 |        8 |       --- |             --- |
-| Slice Logic              |     0.004 |    26171 |       --- |             --- |
-|   LUT as Logic           |     0.003 |    14451 |     20800 |           69.48 |
+| Slice Logic              |     0.003 |    26474 |       --- |             --- |
+|   LUT as Logic           |     0.003 |    14586 |     20800 |           70.13 |
 |   CARRY4                 |    <0.001 |      217 |      8150 |            2.66 |
-|   F7/F8 Muxes            |    <0.001 |     1117 |     32600 |            3.43 |
 |   LUT as Distributed RAM |    <0.001 |      572 |      9600 |            5.96 |
-|   Register               |    <0.001 |     7234 |     41600 |           17.39 |
+|   Register               |    <0.001 |     7229 |     41600 |           17.38 |
+|   F7/F8 Muxes            |    <0.001 |     1118 |     32600 |            3.43 |
 |   Others                 |     0.000 |       40 |       --- |             --- |
-| Signals                  |     0.004 |    18873 |       --- |             --- |
+| Signals                  |     0.004 |    19169 |       --- |             --- |
 | Block RAM                |     0.017 |       32 |        50 |           64.00 |
 | MMCM                     |     0.121 |        1 |         5 |           20.00 |
 | I/O                      |    <0.001 |        5 |       106 |            4.72 |
 | Static Power             |     0.074 |          |           |                 |
-| Total                    |     0.231 |          |           |                 |
+| Total                    |     0.229 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -75,7 +75,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.045 |       0.035 |      0.011 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.044 |       0.033 |      0.011 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.080 |       0.067 |      0.013 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.001 |       0.000 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -146,20 +146,19 @@ Table of Contents
 3.1 By Hierarchy
 ----------------
 
-+---------------+-----------+
-| Name          | Power (W) |
-+---------------+-----------+
-| riscv_top     |     0.158 |
-|   NEW_CLOCK   |     0.121 |
-|     inst      |     0.121 |
-|   cpu0        |     0.017 |
-|     ROB       |     0.008 |
-|     RS        |     0.005 |
-|     instqueue |     0.001 |
-|     regfile   |     0.002 |
-|   hci0        |     0.002 |
-|   ram0        |     0.018 |
-|     ram_bram  |     0.018 |
-+---------------+-----------+
++--------------+-----------+
+| Name         | Power (W) |
++--------------+-----------+
+| riscv_top    |     0.156 |
+|   NEW_CLOCK  |     0.121 |
+|     inst     |     0.121 |
+|   cpu0       |     0.015 |
+|     ROB      |     0.006 |
+|     RS       |     0.005 |
+|     regfile  |     0.002 |
+|   hci0       |     0.002 |
+|   ram0       |     0.018 |
+|     ram_bram |     0.018 |
++--------------+-----------+
 
 
