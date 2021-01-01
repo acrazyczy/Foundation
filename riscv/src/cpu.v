@@ -203,12 +203,14 @@ wire[`IDWidth - 1 : 0] rs_rob_result;
 
 wire rs_rdy, rob_rdy;
 
+wire rdy_in_ = rdy_in && !io_buffer_full;
+
 wire stall = !rs_rdy || !rob_rdy;
 
 	addrunit addrunit(
 		.clk_in                     (clk_in),
 		.rst_in                     (rst_in),
-		.rdy_in                     (rdy_in),
+		.rdy_in                     (rdy_in_),
 
 		.rs_addrunit_a_in           (rs_addrunit_a),
 		.rs_addrunit_vj_in          (rs_addrunit_vj),
@@ -228,7 +230,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	ALU ALU(
 		.clk_in            (clk_in),
 		.rst_in            (rst_in),
-		.rdy_in            (rdy_in),
+		.rdy_in            (rdy_in_),
 
 		.rs_alu_a_in       (rs_alu_a),
 		.rs_alu_vj_in      (rs_alu_vj),
@@ -246,7 +248,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	BP BP(
 		.clk_in              (clk_in),
 		.rst_in              (rst_in),
-		.rdy_in              (rdy_in),
+		.rdy_in              (rdy_in_),
 
 		.bp_taken_out        (bp_taken),
 
@@ -264,7 +266,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	datactrl datactrl(
 		.clk_in                         (clk_in),
 		.rst_in                         (rst_in),
-		.rdy_in                         (rdy_in),
+		.rdy_in                         (rdy_in_),
 		.rob_rst_in                     (rob_rst),
 
 		.rob_datactrl_en_in             (rob_datactrl_en),
@@ -293,7 +295,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	decoder decoder(
 		.clk_in                       (clk_in),
 		.rst_in                       (rst_in),
-		.rdy_in                       (rdy_in),
+		.rdy_in                       (rdy_in_),
 
 		.instqueue_decoder_en_in      (instqueue_decoder_en),
 		.instqueue_decoder_inst_in    (instqueue_decoder_inst),
@@ -322,7 +324,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	dispatcher dispatcher(
 		.clk_in                          (clk_in),
 		.rst_in                          (rst_in),
-		.rdy_in                          (rdy_in),
+		.rdy_in                          (rdy_in_),
 
 		.decoder_dispatcher_en_in        (decoder_dispatcher_en),
 		.decoder_dispatcher_rs_in        (decoder_dispatcher_rs),
@@ -375,7 +377,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	icache icache(
 		.clk_in                     (clk_in),
 		.rst_in                     (rst_in),
-		.rdy_in                     (rdy_in),
+		.rdy_in                     (rdy_in_),
 
 		.if_icache_inst_addr_in     (if_icache_inst_addr),
 		.icache_if_miss_out         (icache_if_miss),
@@ -390,7 +392,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	IF IF(
 		.clk_in                 (clk_in),
 		.rst_in                 (rst_in),
-		.rdy_in                 (rdy_in),
+		.rdy_in                 (rdy_in_),
 
 		.icache_if_miss_in      (icache_if_miss),
 		.icache_if_inst_inst_in (icache_if_inst_inst),
@@ -414,7 +416,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	instqueue instqueue(
 		.clk_in                    (clk_in),
 		.rst_in                    (rst_in),
-		.rdy_in                    (rdy_in),
+		.rdy_in                    (rdy_in_),
 		.stall_in                  (stall),
 
 		.if_instqueue_en_in        (if_instqueue_en),
@@ -435,7 +437,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	lbuffer lbuffer(
 		.clk_in                       (clk_in),
 		.rst_in                       (rst_in),
-		.rdy_in                       (rdy_in),
+		.rdy_in                       (rdy_in_),
 
 		.addrunit_lbuffer_en_in       (addrunit_lbuffer_en),
 		.addrunit_lbuffer_a_in        (addrunit_lbuffer_a),
@@ -463,7 +465,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	ram_controller ram_controller(
 		.clk_in       (clk_in),
 		.rst_in       (rst_in),
-		.rdy_in       (rdy_in),
+		.rdy_in       (rdy_in_),
 
 		.inst_en_in   (icache_ramctrl_en),
 		.inst_rdy_out (ramctrl_icache_inst_rdy),
@@ -488,7 +490,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	regfile regfile(
 		.clk_in                           (clk_in),
 		.rst_in                           (rst_in),
-		.rdy_in                           (rdy_in),
+		.rdy_in                           (rdy_in_),
 
 		.dispatcher_regfile_rs_in         (dispatcher_regfile_rs),
 		.regfile_dispatcher_rs_busy_out   (regfile_dispatcher_rs_busy),
@@ -512,7 +514,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	ROB ROB(
 		.clk_in                      (clk_in),
 		.rst_in                      (rst_in),
-		.rdy_in                      (rdy_in),
+		.rdy_in                      (rdy_in_),
 		.rob_rst_out                 (rob_rst),
 		.stall_in                    (stall),
 
@@ -570,7 +572,7 @@ wire stall = !rs_rdy || !rob_rdy;
 	RS RS(
 		.clk_in                 (clk_in),
 		.rst_in                 (rst_in),
-		.rdy_in                 (rdy_in),
+		.rdy_in                 (rdy_in_),
 		.stall_in               (stall),
 
 		.rs_rdy_out             (rs_rdy),
