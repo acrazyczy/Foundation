@@ -2,8 +2,8 @@
 # Vivado v2020.1 (64-bit)
 # SW Build 2902540 on Wed May 27 19:54:35 MDT 2020
 # IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
-# Start of session at: Sat Jan  2 00:09:36 2021
-# Process ID: 275418
+# Start of session at: Sat Jan  2 21:46:12 2021
+# Process ID: 3320
 # Current directory: /home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1
 # Command line: vivado -log riscv_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source riscv_top.tcl
 # Log file: /home/crazy_cloud/Desktop/Foundation/Foundation.runs/synth_1/riscv_top.vds

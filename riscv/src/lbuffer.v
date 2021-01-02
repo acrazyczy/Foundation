@@ -38,13 +38,11 @@ module lbuffer(
 	reg[`ROBWidth - 1 : 0] dest[`LBCount - 1 : 0];
 	reg[`InstTypeWidth - 1 : 0] opcode[`LBCount - 1 : 0];
 	reg[`LBWidth - 1 : 0] head, tail;
-	reg[1 : 0] stage;
+	reg stage;
 	integer i;
 
-	localparam IDLE = 2'b00;
-	localparam PENDING = 2'b01;
-	localparam BUSY = 2'b10;
-	localparam OK = 2'b11;
+	localparam IDLE = 1'b0;
+	localparam BUSY = 1'b1;
 
 	always @(posedge clk_in) begin
 		lbuffer_rob_h_out <= `ROBWidth'b0;
@@ -61,7 +59,7 @@ module lbuffer(
 		end else begin
 			if (head != tail)
 				if (stage == IDLE) begin
-					if (rob_lbuffer_disambiguation_in) stage <= PENDING;
+					if (rob_lbuffer_disambiguation_in) stage <= BUSY;
 					else if (rob_lbuffer_forwarding_en_in) begin
 						lbuffer_rob_h_out <= dest[head];
 						case (opcode[head])
@@ -73,20 +71,16 @@ module lbuffer(
 						endcase
 						busy[head] <= 1'b0;
 						head <= head % (`LBCount - 1) + 1;
-						stage <= OK;
+						stage <= IDLE;
 					end
-				end else if (stage == PENDING) stage <= BUSY;
-				else if (stage == BUSY) begin
+				end else if (stage == BUSY) begin
 					if (datactrl_lbuffer_en_in) begin
 						lbuffer_rob_h_out <= dest[head];
 						lbuffer_rob_result_out <= datactrl_lbuffer_data_in;
 						busy[head] <= 1'b0;
 						head <= head % (`LBCount - 1) + 1;
-						stage <= OK;
+						stage <= IDLE;
 					end
-				end else begin
-					lbuffer_rob_h_out <= `ROBWidth'b0;
-					stage <= IDLE;
 				end
 			if (addrunit_lbuffer_en_in && lbuffer_rs_rdy_out) begin
 				busy[tail] <= 1'b1;
@@ -128,7 +122,7 @@ module lbuffer(
 	end
 
 	assign lbuffer_datactrl_addr_out = a[head];
-	assign lbuffer_datactrl_en_out = stage == PENDING || stage == BUSY && !datactrl_lbuffer_en_in;
+	assign lbuffer_datactrl_en_out = stage == BUSY && !datactrl_lbuffer_en_in;
 	assign lbuffer_rs_rdy_out = (head != tail % (`LBCount - 1) + 1) && (head != (tail + 1) % (`LBCount - 1) + 1);
 	assign lbuffer_rob_index_out = dest[head];
 endmodule : lbuffer

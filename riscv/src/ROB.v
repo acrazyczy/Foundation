@@ -78,12 +78,11 @@ module ROB(
 	reg bp_taken[`ROBCount - 1 : 0];
 	reg ready[`ROBCount - 1 : 0];
 	reg[`ROBWidth - 1 : 0] head, tail;
-	reg[1 : 0] stage;
+	reg stage;
 	integer i;
 
-	localparam IDLE = 2'b00;
-	localparam PENDING = 2'b01;
-	localparam BUSY = 2'b10;
+	localparam IDLE = 1'b0;
+	localparam BUSY = 1'b1;
 
 	always @(posedge clk_in) begin
 		rob_rst_out <= 1'b0;
@@ -122,8 +121,7 @@ module ROB(
 				value[rs_rob_h_in] <= rs_rob_result_in;
 				ready[rs_rob_h_in] <= 1'b1;
 			end
-			if (stage == PENDING) stage <= BUSY;
-			else if (stage == BUSY) begin
+			if (stage == BUSY) begin
 				if (datactrl_rob_en_in) begin
 					stage <= IDLE;
 					busy[head] <= 1'b0;
@@ -152,7 +150,7 @@ module ROB(
 						pc[head] <= `AddressWidth'b0;
 						head <= head % (`ROBCount - 1) + 1;
 					end
-				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= PENDING;
+				end else if (`SB <= opcode[head] && opcode[head] <= `SW) stage <= BUSY;
 				else begin
 					rob_regfile_en_out <= 1'b1;
 					rob_regfile_d_out <= dest[head];
@@ -214,7 +212,7 @@ module ROB(
 
 	assign rob_datactrl_addr_out = address[head];
 	assign rob_datactrl_data_out = value[head];
-	assign rob_datactrl_en_out = stage == PENDING || stage == BUSY && !datactrl_rob_en_in;
+	assign rob_datactrl_en_out = stage == BUSY && !datactrl_rob_en_in;
 	assign rob_rdy_out = (head != tail % (`ROBCount - 1) + 1) && (head != (tail + 1) % (`ROBCount - 1) + 1);
 	assign rob_dispatcher_rs_ready_out = ready[dispatcher_rob_rs_h_in] || alu_rob_h_in == dispatcher_rob_rs_h_in || lbuffer_rob_h_in == dispatcher_rob_rs_h_in;
 	assign rob_dispatcher_rs_value_out = alu_rob_h_in == dispatcher_rob_rs_h_in ? alu_rob_result_in : (lbuffer_rob_h_in == dispatcher_rob_rs_h_in ? lbuffer_rob_result_in : value[dispatcher_rob_rs_h_in]);

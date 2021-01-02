@@ -6,8 +6,8 @@
 
 # new environment variables
 export CMAKE_PREFIX_PATH="/home/crazy_cloud/Desktop/Foundation/serial/build/devel"
-export LD_LIBRARY_PATH=""
-export PKG_CONFIG_PATH=""
+export LD_LIBRARY_PATH="/home/crazy_cloud/Desktop/Foundation/serial/build/devel/lib"
+export PKG_CONFIG_PATH="/home/crazy_cloud/Desktop/Foundation/serial/build/devel/lib/pkgconfig"
 export PYTHONPATH=""
 
 # modified environment variables
