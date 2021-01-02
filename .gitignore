@@ -6,4 +6,6 @@ Foundation.hbs/
 Foundation.hw/
 Foundation.ip_user_files/
 Foundation.sim/
+Foundation.runs/
+Foundation.srcs/
 riscv/test/
