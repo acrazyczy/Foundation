@@ -1,4 +1,4 @@
-# Foundation
+# RISCV-CPU
 MS108 homework in ACM 2019 class, a toy RISC-V CPU supporting partial of rv32i ISA.
 
 Have passed all testcases on FPGA with 100MHz. The worst negative slack is -2.697ns.
